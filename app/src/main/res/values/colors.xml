@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- priority color Start-->
+    <!--    active Task-->
+    <color name="color_priority_low">#A7F3D0</color>
+    <color name="color_priority_high">#F87171</color>
+    <color name="color_priority_medium">#FBBF24</color>
+    <!--    completed Task-->
+    <color name="color_priority_low_transparency">#B3A7F3D0</color>
+    <color name="color_priority_high_transparency">#B3F87171</color>
+    <color name="color_priority_medium_transparency">#B3FBBF24</color>
+    <!-- priority color End-->
+
+    <!--progress colors Start-->
+    <color name="progress_first_step">#FF4444</color>
+    <color name="progress_second_step">#FF8800</color>
+    <color name="progress_third_step">#FFBB33</color>
+    <color name="progress_fourth_step">#99CC00</color>
+    <color name="progress_fifth_step">#00C851</color>
+    <!--progress colors End-->
+
+    <!--    main UI colors Start-->
+    <color name="background_dark">#202124</color>
+    <color name="surface_dark">#2D2E30</color>
+    <color name="surface_variant_dark">#3C4043</color>
+    <color name="surface_dark_transparency">#C02D2E30</color>
+    <!--    main UI colors End-->
+
+    <color name="buttons_color">#669DF6</color>
+    <color name="buttons_secondary">#9AA0A6</color>
+
+    <color name="text_primary_dark">#E8EAED</color>
+    <color name="text_primary_dark_transparency">#99E8EAED</color>
+    <color name="text_secondary_dark">#9AA0A6</color>
+    <color name="text_disabled_dark">#5F6368</color>
+
+    <!--    plans colors Start-->
+    <color name="plan_color_default">#2D2E30</color>
+    <color name="plan_color_blue">#5E97F6</color>
+    <color name="plan_color_teal">#26C6DA</color>
+    <color name="plan_color_purple">#BA68C8</color>
+    <color name="plan_color_pink">#EC407A</color>
+    <color name="plan_color_orange">#FFA726</color>
+    <color name="plan_color_ime">#9CCC65</color>
+    <!--    plans colors End-->
+
+</resources>

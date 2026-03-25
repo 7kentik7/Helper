@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Стиль для диалога со спиннерами -->
+    <style name="CustomDatePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:datePickerStyle">@style/CustomDatePicker</item>
+    </style>
+
+    <!-- Стиль для самого DatePicker -->
+    <style name="CustomDatePicker" parent="android:Widget.Material.DatePicker">
+        <item name="android:datePickerMode">spinner</item>     <!-- Главное - режим спиннера -->
+        <item name="android:calendarViewShown">false</item>    <!-- Скрываем календарь -->
+        <item name="android:spinnersShown">true</item>         <!-- Показываем только спиннеры -->
+
+    </style>
+
+    <style name="DialogRoundedShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">32dp</item>
+    </style>
+</resources>
