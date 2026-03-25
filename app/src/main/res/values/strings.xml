@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HelperApp</string>
+    <string name="app_name">HelperJC</string>
     <string name="add_description">Добавить дополнительную информацию</string>
     <string name="title">Добавить задачу</string>
     <string name="save">Сохранить</string>
