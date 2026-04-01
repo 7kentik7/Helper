@@ -1,11 +1,15 @@
 package com.example.helperjc.presentationJC
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,14 +18,11 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -29,6 +30,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,7 +52,9 @@ fun HelperScreen() {
             title = "План",
             innerPadding = innerPadding,
             countOfTask = 1,
-            countOfCompletedTask = 2
+            countOfCompletedTask = 2,
+            progress = 0.3f,
+            deadLine = "20.02.2026"
         )
     }
 }
@@ -78,11 +82,14 @@ private fun AppBar(
 
 @Composable
 private fun PlanItem(
-    title: String,
     innerPadding: PaddingValues,
+    deadLine: String,
+    title: String,
+    progress: Float,
     countOfTask: Int,
-    countOfCompletedTask: Int
-) {
+    countOfCompletedTask: Int,
+
+    ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,19 +101,13 @@ private fun PlanItem(
         ),
         onClick = {}
     ) {
-        Column(modifier = Modifier.padding(2.dp)) {
-            Text(text = "20.02.2027", modifier = Modifier.padding(4.dp), fontSize = 14.sp)
-            Text(text = title, modifier = Modifier.padding(4.dp), fontSize = 18.sp)
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                color = Color.Red,
-                progress = { 1f })
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(text = deadLine, fontSize = 14.sp)
+            Text(text = title, fontSize = 18.sp)
+            ProgressBarForItemHelper(progress)
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(2.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -134,6 +135,26 @@ private fun PlanItem(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ProgressBarForItemHelper(progress: Float) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+
+            .height(4.dp)
+            .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(progress)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(50))
+                .background(Color.Cyan)
+        )
     }
 }
 
