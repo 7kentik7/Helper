@@ -6,7 +6,7 @@ import com.example.helperjc.presentation.viewmodels.plans.AddPlanViewModel
 import com.example.helperjc.presentation.viewmodels.tasks.AddTaskForPlanViewModel
 import com.example.helperjc.presentation.viewmodels.tasks.AddTaskViewModel
 import com.example.helperjc.presentation.viewmodels.plans.EditPlanDetailsViewModel
-import com.example.helperapp.presentation.viewmodels.HelperViewModel
+import com.example.helperjc.presentation.viewmodels.HelperViewModel
 import com.example.helperjc.presentation.viewmodels.plans.PlanDetailsViewModel
 import com.example.helperjc.presentation.viewmodels.tasks.TodoListViewModel
 import dagger.Binds

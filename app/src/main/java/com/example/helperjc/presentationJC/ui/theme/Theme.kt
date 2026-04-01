@@ -11,20 +11,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import com.example.helperjc.ui.theme.BackgroundDark
-import com.example.helperjc.ui.theme.BackgroundLight
-import com.example.helperjc.ui.theme.ButtonColorDark
-import com.example.helperjc.ui.theme.ButtonColorLight
-import com.example.helperjc.ui.theme.ButtonSecondaryDark
-import com.example.helperjc.ui.theme.ButtonSecondaryLight
-import com.example.helperjc.ui.theme.SurfaceDark
-import com.example.helperjc.ui.theme.SurfaceLight
-import com.example.helperjc.ui.theme.SurfaceVariantDark
-import com.example.helperjc.ui.theme.SurfaceVariantLight
-import com.example.helperjc.ui.theme.TextDisabledDark
-import com.example.helperjc.ui.theme.TextDisabledLight
-import com.example.helperjc.ui.theme.TextPrimaryDark
-import com.example.helperjc.ui.theme.TextPrimaryLight
 
 private val DarkColorScheme = darkColorScheme(
     background = BackgroundDark,
