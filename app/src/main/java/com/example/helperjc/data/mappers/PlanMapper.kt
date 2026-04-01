@@ -4,8 +4,9 @@ import com.example.helperjc.data.database.models.PlanDbModel
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.enums.PlanColor
 import com.example.helperjc.enums.PlanRepeatType
-import com.example.helperapp.toLocalDateTime
-import com.example.helperapp.toTimeInMillis
+import com.example.helperjc.toLocalDateTime
+import com.example.helperjc.toTimeInMillis
+
 import javax.inject.Inject
 
 class PlanMapper @Inject constructor() {

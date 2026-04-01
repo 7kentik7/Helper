@@ -6,4 +6,6 @@
     </style>
 
     <style name="Theme.HelperApp" parent="Base.Theme.HelperApp" />
+
+    <style name="Theme.AppCompat" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>
