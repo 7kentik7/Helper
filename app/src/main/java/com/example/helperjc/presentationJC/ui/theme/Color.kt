@@ -32,3 +32,7 @@ val ProgressSecondStep = Color(0xFFFF8800)
 val ProgressThirdStep = Color(0xFFFFBB33)
 val ProgressFourthStep = Color(0xFF99CC00)
 val ProgressFifthStep = Color(0xFF00C851)
+
+val PriorityLow =Color(0xFFA7F3D0)
+val PriorityMedium =Color(0xFFF87171)
+val PriorityHigh =Color(0xFFFBBF24)

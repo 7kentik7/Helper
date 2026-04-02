@@ -12,10 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
@@ -35,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,6 +49,7 @@ import com.example.helperjc.presentationJC.ui.theme.ProgressFirstStep
 import com.example.helperjc.presentationJC.ui.theme.ProgressFourthStep
 import com.example.helperjc.presentationJC.ui.theme.ProgressSecondStep
 import com.example.helperjc.presentationJC.ui.theme.ProgressThirdStep
+import com.example.helperjc.toLocalDateTime
 
 
 @Composable
@@ -77,7 +77,6 @@ fun HelperScreen() {
                 tasks = listOf()
             )
         )
-
     }
 }
 
@@ -85,7 +84,9 @@ fun HelperScreen() {
 @Composable
 private fun AppBar() {
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background
+        ),
         actions = {
             IconButton(onClick = {}) {
                 Icon(
@@ -119,7 +120,7 @@ private fun PlanItem(innerPadding: PaddingValues, planDetails: PlanDetails) {
             .fillMaxWidth()
             .padding(innerPadding),
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(2.dp, color = Color.Cyan),
+        border = BorderStroke(1.dp, color = Color.Cyan),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -137,9 +138,12 @@ private fun PlanItem(innerPadding: PaddingValues, planDetails: PlanDetails) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column() {
+                Column {
                     Text(
-                        text = stringResource(id = R.string.tasks_count, planDetails.countOfTasks),
+                        text = stringResource(
+                            id = R.string.tasks_count,
+                            planDetails.countOfTasks
+                        ),
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -155,7 +159,7 @@ private fun PlanItem(innerPadding: PaddingValues, planDetails: PlanDetails) {
 
                 IconButton(onClick = {}) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.add_task),
+                        painter = painterResource(R.drawable.add_task),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp)
