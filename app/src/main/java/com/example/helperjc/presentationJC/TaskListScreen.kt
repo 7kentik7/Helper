@@ -89,6 +89,7 @@ fun TaskItem(innerPadding: PaddingValues, task: Task) {
                 TaskPriority.MEDIUM -> PriorityMedium
                 TaskPriority.HIGH -> PriorityHigh
             }
+
             RadioButton(
                 selected = task.isActive,
                 onClick = { !task.isActive },
