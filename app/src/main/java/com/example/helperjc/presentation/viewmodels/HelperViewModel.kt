@@ -6,11 +6,13 @@ import com.example.helperjc.domain.plandetails.usecases.GetListPlanDetailsUseCas
 import com.example.helperjc.domain.plandetails.PlanDetails
 import com.example.helperjc.domain.plans.usecases.DeletePlanUseCase
 import com.example.helperjc.presentation.states.HelperState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class HelperViewModel @Inject constructor(
     private val getListPlanDetailsUseCase: GetListPlanDetailsUseCase,
     private val deletePlanUseCase: DeletePlanUseCase

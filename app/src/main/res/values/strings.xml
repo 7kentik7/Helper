@@ -13,4 +13,5 @@
     <string name="completed_tasks_count">Выполнено: %1$d</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="name">Название</string>
+    <string name="description">Описание</string>
 </resources>

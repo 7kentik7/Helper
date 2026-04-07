@@ -15,7 +15,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
-import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -79,28 +78,18 @@ fun AddEditPlanDialog() {
                 val state = remember { mutableStateOf(false) }
                 InputChip(
                     onClick = {
-
                         state.value = !state.value
                     },
                     label = { Text("20.02.2005") },
                     selected = state.value,
-                    avatar = {
-                        Icon(
-                            painter = painterResource(R.drawable.outline_timer_24),
-                            contentDescription = "Localized description",
-                            Modifier.size(InputChipDefaults.AvatarSize)
-                        )
-                    },
                     trailingIcon = {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Localized description",
+                            contentDescription = null,
                             Modifier.size(16.dp)
                         )
                     }
                 )
-
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
