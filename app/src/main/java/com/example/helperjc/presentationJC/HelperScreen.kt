@@ -39,10 +39,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.helperjc.R
 import com.example.helperjc.domain.plandetails.PlanDetails
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.parseToString
+import com.example.helperjc.presentation.viewmodels.HelperViewModel
 import com.example.helperjc.presentationJC.ui.theme.HelperJCTheme
 import com.example.helperjc.presentationJC.ui.theme.ProgressFifthStep
 import com.example.helperjc.presentationJC.ui.theme.ProgressFirstStep
@@ -53,7 +55,7 @@ import com.example.helperjc.toLocalDateTime
 
 
 @Composable
-fun HelperScreen() {
+fun HelperScreen(viewModel: HelperViewModel = hiltViewModel()) {
     Scaffold(
         topBar = { AppBar() },
         containerColor = MaterialTheme.colorScheme.background,

@@ -1,26 +1,29 @@
 package com.example.helperjc.di.modules
 
-import com.example.helperjc.di.scopes.HelperScope
-import com.example.helperjc.domain.plandetails.repository.PlanDetailsRepository
-import com.example.helperjc.domain.plans.repository.PlanRepository
-import com.example.helperjc.domain.tasks.repository.TaskRepository
 import com.example.helperjc.data.repositoriesimpl.PlanDetailsRepositoryImpl
 import com.example.helperjc.data.repositoriesimpl.PlanRepositoryImpl
 import com.example.helperjc.data.repositoriesimpl.TaskRepositoryImpl
+import com.example.helperjc.domain.plandetails.repository.PlanDetailsRepository
+import com.example.helperjc.domain.plans.repository.PlanRepository
+import com.example.helperjc.domain.tasks.repository.TaskRepository
 import dagger.Binds
 import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
-interface DomainModule {
+@InstallIn(SingletonComponent::class)
+abstract class DomainModule {
     @Binds
-    @HelperScope
-    fun bindTaskRepository(impl: TaskRepositoryImpl): TaskRepository
+    @Singleton
+   abstract fun bindTaskRepository(impl: TaskRepositoryImpl): TaskRepository
 
     @Binds
-    @HelperScope
-    fun bindPlanRepository(impl: PlanRepositoryImpl): PlanRepository
+    @Singleton
+    abstract fun bindPlanRepository(impl: PlanRepositoryImpl): PlanRepository
 
     @Binds
-    @HelperScope
-    fun bindPlanDetailsRepository(impl: PlanDetailsRepositoryImpl): PlanDetailsRepository
+    @Singleton
+    abstract  fun bindPlanDetailsRepository(impl: PlanDetailsRepositoryImpl): PlanDetailsRepository
 }

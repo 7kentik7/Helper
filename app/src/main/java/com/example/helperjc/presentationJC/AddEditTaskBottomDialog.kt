@@ -1,17 +1,12 @@
 package com.example.helperjc.presentationJC
 
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,8 +18,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +34,9 @@ import com.example.helperjc.R
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.presentationJC.ui.theme.HelperJCTheme
+import com.example.helperjc.presentationJC.ui.theme.PriorityHigh
+import com.example.helperjc.presentationJC.ui.theme.PriorityLow
+import com.example.helperjc.presentationJC.ui.theme.PriorityMedium
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,19 +58,24 @@ fun AddEditTaskDialog() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {
-                    if (descriptionState.value) {
-                        descriptionState.value = !descriptionState.value
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = {
+                        if (!descriptionState.value) {
+                            descriptionState.value = !descriptionState.value
+                        }
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.description_icon),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.outline
+                        )
                     }
-
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.description_icon),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.outline
-                    )
+                    RadioButtonsPriority(task = Task(priority = TaskPriority.HIGH))
                 }
-                RadioButtonsPriority()
+
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = stringResource(R.string.save),
@@ -113,30 +114,47 @@ private fun TextFields(descriptionState: State<Boolean>) {
 
 @Composable
 private fun RadioButtonsPriority(task: Task?) {
-    val radioOptions = listOf(TaskPriority.LOW, TaskPriority.HIGH, TaskPriority.HIGH)
+    val radioOptions = listOf(
+        TaskPriority.LOW,
+        TaskPriority.MEDIUM,
+        TaskPriority.HIGH
+    )
     val (selectedOption, onOptionSelected) = remember {
         mutableStateOf(task?.priority ?: TaskPriority.MEDIUM)
     }
-    radioOptions.forEach { priority ->
-        Row(
-            modifier = Modifier
-                .selectable(
-                    selected = (priority == selectedOption),
-                    onClick = {onOptionSelected(priority)},
-                    role = Role.RadioButton
-                )
-        ) {
+    Row(
+        modifier = Modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        radioOptions.forEach { priority ->
 
-            RadioButton(
-                selected = true,
-                onClick = { },
-                colors = RadioButtonDefaults.colors(
-                    unselectedColor = MaterialTheme.colorScheme.outline
+            Row(
+                modifier = Modifier
+                    .selectable(
+                        selected = (priority == selectedOption),
+                        onClick = { onOptionSelected(priority) },
+                        role = Role.RadioButton
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val radioButtonColorByPriority = when (priority) {
+                    TaskPriority.LOW -> PriorityLow
+                    TaskPriority.MEDIUM -> PriorityMedium
+                    TaskPriority.HIGH -> PriorityHigh
+                }
+                RadioButton(
+                    modifier = Modifier.padding(5.dp),
+                    selected = priority == selectedOption,
+                    onClick = null,
+                    colors = RadioButtonDefaults.colors(
+                        unselectedColor = radioButtonColorByPriority,
+                        selectedColor = radioButtonColorByPriority
+                    )
                 )
-            )
-
+            }
         }
     }
+
 }
 
 @Preview
