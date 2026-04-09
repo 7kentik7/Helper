@@ -1,29 +1,30 @@
-package com.example.helperjc.presentation.viewmodels
+package com.example.helperjc.presentationJC.helper
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.helperjc.domain.plandetails.usecases.GetListPlanDetailsUseCase
 import com.example.helperjc.domain.plandetails.PlanDetails
+import com.example.helperjc.domain.plandetails.usecases.GetListPlanDetailsUseCase
 import com.example.helperjc.domain.plans.usecases.DeletePlanUseCase
-import com.example.helperjc.presentation.states.HelperState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class HelperState(val planDetailsList: List<PlanDetails> = emptyList())
+
 @HiltViewModel
 class HelperViewModel @Inject constructor(
     private val getListPlanDetailsUseCase: GetListPlanDetailsUseCase,
     private val deletePlanUseCase: DeletePlanUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow<HelperState>(HelperState.Initial)
+    private val _state = MutableStateFlow<HelperState>(HelperState())
     val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
             getListPlanDetailsUseCase().collect {
-                _state.value = HelperState.DataLoaded(it)
+                _state.value = HelperState(it)
             }
         }
     }

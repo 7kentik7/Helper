@@ -1,4 +1,4 @@
-package com.example.helperjc.presentationJC
+package com.example.helperjc.presentationJC.helper
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -28,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,28 +43,41 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
 import com.example.helperjc.domain.plandetails.PlanDetails
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.parseToString
-import com.example.helperjc.presentation.viewmodels.HelperViewModel
 import com.example.helperjc.presentationJC.ui.theme.HelperJCTheme
 import com.example.helperjc.presentationJC.ui.theme.ProgressFifthStep
 import com.example.helperjc.presentationJC.ui.theme.ProgressFirstStep
 import com.example.helperjc.presentationJC.ui.theme.ProgressFourthStep
 import com.example.helperjc.presentationJC.ui.theme.ProgressSecondStep
 import com.example.helperjc.presentationJC.ui.theme.ProgressThirdStep
-import com.example.helperjc.toLocalDateTime
 
 
 @Composable
-fun HelperScreen(viewModel: HelperViewModel = hiltViewModel()) {
+fun HelperScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HelperViewModel = hiltViewModel(),
+    onTasksClick: () -> Unit,
+    onNotesClick: () -> Unit,
+    onPlanItemClick: (PlanDetails) -> Unit,
+    onAddPlanClick: () -> Unit,
+    onAddTaskForPlanClick: (PlanDetails) -> Unit
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(
-        topBar = { AppBar() },
+        topBar = {
+            AppBar(
+                onTasksClick = onTasksClick,
+                onNotesClick = onTasksClick
+            )
+        },
         containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { },
+                onClick = onAddPlanClick,
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
@@ -69,35 +85,42 @@ fun HelperScreen(viewModel: HelperViewModel = hiltViewModel()) {
             }
         }
     ) { innerPadding ->
-        PlanItem(
-            innerPadding = innerPadding,
-            planDetails = PlanDetails(
-                plan = Plan(title = "План", endTime = null),
-                progress = 0,
-                countOfTasks = 3,
-                countOfCompletedTasks = 2,
-                tasks = listOf()
-            )
-        )
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(horizontal = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(state.planDetailsList) { planDetails ->
+                PlanItem(
+                    planDetails = planDetails,
+                    onPlanItemClick = onPlanItemClick,
+                    onAddTaskForPlanClick = onAddTaskForPlanClick,
+                )
+            }
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AppBar() {
+private fun AppBar(
+    onTasksClick: () -> Unit,
+    onNotesClick: () -> Unit,
+) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
         ),
         actions = {
-            IconButton(onClick = {}) {
+            IconButton(onClick = onNotesClick) {
                 Icon(
                     modifier = Modifier.size(24.dp),
                     imageVector = ImageVector.vectorResource(R.drawable.notes_icon),
                     contentDescription = null
                 )
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = onTasksClick) {
                 Icon(
                     modifier = Modifier.size(24.dp),
                     imageVector = ImageVector.vectorResource(R.drawable.tasks_icon),
@@ -116,7 +139,12 @@ private fun AppBar() {
 
 
 @Composable
-private fun PlanItem(innerPadding: PaddingValues, planDetails: PlanDetails) {
+private fun PlanItem(
+    innerPadding: PaddingValues = PaddingValues(),
+    planDetails: PlanDetails,
+    onPlanItemClick: (PlanDetails) -> Unit,
+    onAddTaskForPlanClick: (PlanDetails) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -126,7 +154,7 @@ private fun PlanItem(innerPadding: PaddingValues, planDetails: PlanDetails) {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        onClick = {}
+        onClick = { onPlanItemClick(planDetails) }
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             planDetails.plan.endTime?.parseToString()?.let {
@@ -159,7 +187,7 @@ private fun PlanItem(innerPadding: PaddingValues, planDetails: PlanDetails) {
                     )
                 }
 
-                IconButton(onClick = {}) {
+                IconButton(onClick = { onAddTaskForPlanClick(planDetails) }) {
                     Icon(
                         painter = painterResource(R.drawable.add_task),
                         contentDescription = null,
@@ -223,15 +251,15 @@ fun ProgressBarForItemHelper(progress: Int) {
 @Preview
 @Composable
 fun PreviewHelperScreenDark() {
-    HelperJCTheme(darkTheme = true, dynamicColor = false) {
-        HelperScreen()
+    HelperJCTheme(darkTheme = true) {
+//        HelperScreen()
     }
 }
 
 @Preview
 @Composable
 fun PreviewHelperScreenLight() {
-    HelperJCTheme(darkTheme = false, dynamicColor = false) {
-        HelperScreen()
+    HelperJCTheme(darkTheme = false) {
+//        HelperScreen()
     }
 }
