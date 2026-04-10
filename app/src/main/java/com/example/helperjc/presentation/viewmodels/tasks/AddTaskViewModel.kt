@@ -9,11 +9,13 @@ import com.example.helperjc.domain.tasks.usecases.AddEditTaskUseCase
 import com.example.helperjc.domain.tasks.usecases.GetTaskUseCase
 import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.presentation.states.tasks.AddTaskState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class AddTaskViewModel @Inject constructor(
     private val addEditTaskUseCase: AddEditTaskUseCase,
     private val getTaskUseCase: GetTaskUseCase

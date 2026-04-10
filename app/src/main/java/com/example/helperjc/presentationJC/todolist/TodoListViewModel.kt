@@ -1,4 +1,4 @@
-package com.example.helperjc.presentation.viewmodels.tasks
+package com.example.helperjc.presentationJC.todolist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,18 +6,21 @@ import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.domain.tasks.usecases.AddEditTaskUseCase
 import com.example.helperjc.domain.tasks.usecases.DeleteTaskUseCase
 import com.example.helperjc.domain.tasks.usecases.GetTasksListUseCase
-import com.example.helperjc.presentation.states.tasks.TaskListState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class TaskListState(val currencyList: List<Task> = listOf())
+
+@HiltViewModel
 class TodoListViewModel @Inject constructor(
     private val getTasksListUseCase: GetTasksListUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val addEditTaskUseCase: AddEditTaskUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow<TaskListState>(TaskListState.Initial)
+    private val _state = MutableStateFlow(TaskListState())
     val state = _state.asStateFlow()
 
     init {
@@ -31,7 +34,7 @@ class TodoListViewModel @Inject constructor(
                             it.priority
                         }
                     )
-                _state.value = TaskListState.DataLoaded(sortedList)
+                _state.value = TaskListState(sortedList)
             }
         }
     }

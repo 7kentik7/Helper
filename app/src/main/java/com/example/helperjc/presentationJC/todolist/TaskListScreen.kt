@@ -1,4 +1,4 @@
-package com.example.helperjc.presentationJC
+package com.example.helperjc.presentationJC.todolist
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -25,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,6 +35,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.enums.TaskPriority
@@ -41,7 +46,8 @@ import com.example.helperjc.presentationJC.ui.theme.PriorityLow
 import com.example.helperjc.presentationJC.ui.theme.PriorityMedium
 
 @Composable
-fun TaskListScreen() {
+fun TaskListScreen(viewModel: TodoListViewModel = hiltViewModel()) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(
         topBar = { AppBar() },
         containerColor = MaterialTheme.colorScheme.background,
@@ -55,20 +61,27 @@ fun TaskListScreen() {
             }
         }
     ) { innerPadding ->
-        TaskItem(
-            innerPadding = innerPadding,
-            task = Task(
-                title = "Задача",
-                description = "Описание",
-                isActive = true,
-                priority = TaskPriority.LOW
-            )
-        )
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(horizontal = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(state.currencyList) { task ->
+                TaskItem(
+                    innerPadding = innerPadding,
+                    taskItem = task,
+                    changeEnabledState = viewModel::changeEnableState
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun TaskItem(innerPadding: PaddingValues, task: Task) {
+fun TaskItem(
+    innerPadding: PaddingValues, taskItem: Task, changeEnabledState: (Task) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,15 +97,15 @@ fun TaskItem(innerPadding: PaddingValues, task: Task) {
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            val color = when (task.priority) {
+            val color = when (taskItem.priority) {
                 TaskPriority.LOW -> PriorityLow
                 TaskPriority.MEDIUM -> PriorityMedium
                 TaskPriority.HIGH -> PriorityHigh
             }
 
             RadioButton(
-                selected = task.isActive,
-                onClick = { !task.isActive },
+                selected = taskItem.isActive,
+                onClick = { changeEnabledState(taskItem) },
                 colors = RadioButtonDefaults.colors(
                     selectedColor = color,
                     unselectedColor = MaterialTheme.colorScheme.outline
@@ -103,9 +116,9 @@ fun TaskItem(innerPadding: PaddingValues, task: Task) {
                 modifier = Modifier.padding(8.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = task.title, fontSize = 18.sp)
-                if (!task.description.isNullOrBlank()) {
-                    Text(text = task.description, fontSize = 16.sp)
+                Text(text = taskItem.title, fontSize = 18.sp)
+                if (!taskItem.description.isNullOrBlank()) {
+                    Text(text = taskItem.description, fontSize = 16.sp)
                 }
 
             }
@@ -139,7 +152,7 @@ private fun AppBar() {
 @Composable
 fun PreviewTaskListScreenDark() {
     HelperJCTheme(darkTheme = true, dynamicColor = false) {
-        TaskListScreen()
+//        TaskListScreen()
     }
 }
 
@@ -147,6 +160,6 @@ fun PreviewTaskListScreenDark() {
 @Composable
 fun PreviewTaskListScreenLight() {
     HelperJCTheme(darkTheme = false, dynamicColor = false) {
-        TaskListScreen()
+//        TaskListScreen()
     }
 }

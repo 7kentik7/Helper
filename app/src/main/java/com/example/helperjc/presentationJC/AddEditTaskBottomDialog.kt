@@ -14,12 +14,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,9 +32,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.enums.TaskPriority
+import com.example.helperjc.presentation.viewmodels.tasks.AddTaskViewModel
 import com.example.helperjc.presentationJC.ui.theme.HelperJCTheme
 import com.example.helperjc.presentationJC.ui.theme.PriorityHigh
 import com.example.helperjc.presentationJC.ui.theme.PriorityLow
@@ -40,8 +45,13 @@ import com.example.helperjc.presentationJC.ui.theme.PriorityMedium
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEditTaskDialog() {
-    ModalBottomSheet(onDismissRequest = { }) {
+fun AddEditTaskDialog(
+    modifier: Modifier = Modifier,
+    viewmodel: AddTaskViewModel = hiltViewModel(),
+    onDismissClick: () -> Unit
+) {
+    val state by viewmodel.state.collectAsStateWithLifecycle()
+    ModalBottomSheet(onDismissRequest = onDismissClick) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -88,7 +98,12 @@ fun AddEditTaskDialog() {
 }
 
 @Composable
-private fun TextFields(descriptionState: State<Boolean>) {
+private fun TextFields(
+    descriptionState: State<Boolean>,
+    onTitleChange: () -> Unit,
+    onDescriptionChange: () -> Unit,
+
+    ) {
     TextField(
         value = "",
         onValueChange = { },
@@ -113,7 +128,7 @@ private fun TextFields(descriptionState: State<Boolean>) {
 }
 
 @Composable
-private fun RadioButtonsPriority(task: Task?) {
+private fun RadioButtonsPriority(task: Task?, onOptionSelected: (TaskPriority) -> Unit) {
     val radioOptions = listOf(
         TaskPriority.LOW,
         TaskPriority.MEDIUM,
@@ -161,7 +176,7 @@ private fun RadioButtonsPriority(task: Task?) {
 @Composable
 fun PreviewAddEditTaskDialogDark() {
     HelperJCTheme(darkTheme = true, dynamicColor = false) {
-        AddEditTaskDialog()
+//        AddEditTaskDialog()
     }
 }
 
@@ -169,6 +184,6 @@ fun PreviewAddEditTaskDialogDark() {
 @Composable
 fun PreviewAddEditTaskDialogLight() {
     HelperJCTheme(darkTheme = false, dynamicColor = false) {
-        AddEditTaskDialog()
+//        AddEditTaskDialog()
     }
 }

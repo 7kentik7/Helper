@@ -18,7 +18,7 @@ class HelperViewModel @Inject constructor(
     private val getListPlanDetailsUseCase: GetListPlanDetailsUseCase,
     private val deletePlanUseCase: DeletePlanUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow<HelperState>(HelperState())
+    private val _state = MutableStateFlow(HelperState())
     val state = _state.asStateFlow()
 
     init {
