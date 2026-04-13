@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.helperjc.presentationJC.addEditPlan.AddEditPlanDialog
+import com.example.helperjc.presentationJC.addEditPlan.AddEditPlanScreen
 import com.example.helperjc.presentationJC.helper.HelperScreen
 
 @Composable
@@ -36,8 +36,9 @@ fun HelperNavGraph(
             )
         }
         composable(route = Screen.AddEditPlan.route) {
-            AddEditPlanDialog(
-                onDismissClick = { navActions.navigateUp() },
+            AddEditPlanScreen(
+                modifier = Modifier.fillMaxSize(),
+                onArrowBackClick = { navActions.navigateUp() },
                 onSaveButtonClick = { navActions.navigateUp() }
             )
         }

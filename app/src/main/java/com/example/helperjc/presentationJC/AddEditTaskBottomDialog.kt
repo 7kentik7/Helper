@@ -48,7 +48,8 @@ import com.example.helperjc.presentationJC.ui.theme.PriorityMedium
 fun AddEditTaskDialog(
     modifier: Modifier = Modifier,
     viewmodel: AddTaskViewModel = hiltViewModel(),
-    onDismissClick: () -> Unit
+    onDismissClick: () -> Unit,
+    onSaveButtonClick: () -> Unit
 ) {
     val state by viewmodel.state.collectAsStateWithLifecycle()
     ModalBottomSheet(onDismissRequest = onDismissClick) {
@@ -62,7 +63,27 @@ fun AddEditTaskDialog(
             )
         ) {
             val descriptionState = remember { mutableStateOf(false) }
-            TextFields(descriptionState)
+            TextField(
+                value = state.title,
+                onValueChange = viewmodel::onTitleChange,
+                label = { Text(stringResource(R.string.name)) },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(PaddingValues(start = 4.dp, end = 4.dp)),
+            )
+
+            if (descriptionState.value) {
+                TextField(
+                    value = state.description,
+                    onValueChange = viewmodel::onDescriptionChange,
+                    label = { Text(text = stringResource(R.string.description)) },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(PaddingValues(start = 4.dp, end = 4.dp)),
+                )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -97,38 +118,9 @@ fun AddEditTaskDialog(
     }
 }
 
-@Composable
-private fun TextFields(
-    descriptionState: State<Boolean>,
-    onTitleChange: () -> Unit,
-    onDescriptionChange: () -> Unit,
-
-    ) {
-    TextField(
-        value = "",
-        onValueChange = { },
-        label = { Text(stringResource(R.string.name)) },
-        singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(PaddingValues(start = 4.dp, end = 4.dp)),
-    )
-
-    if (descriptionState.value) {
-        TextField(
-            value = "",
-            onValueChange = { },
-            label = { Text(text = stringResource(R.string.description)) },
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(PaddingValues(start = 4.dp, end = 4.dp)),
-        )
-    }
-}
 
 @Composable
-private fun RadioButtonsPriority(task: Task?, onOptionSelected: (TaskPriority) -> Unit) {
+private fun RadioButtonsPriority(task: Task?) {
     val radioOptions = listOf(
         TaskPriority.LOW,
         TaskPriority.MEDIUM,
@@ -170,20 +162,4 @@ private fun RadioButtonsPriority(task: Task?, onOptionSelected: (TaskPriority) -
         }
     }
 
-}
-
-@Preview
-@Composable
-fun PreviewAddEditTaskDialogDark() {
-    HelperJCTheme(darkTheme = true, dynamicColor = false) {
-//        AddEditTaskDialog()
-    }
-}
-
-@Preview
-@Composable
-fun PreviewAddEditTaskDialogLight() {
-    HelperJCTheme(darkTheme = false, dynamicColor = false) {
-//        AddEditTaskDialog()
-    }
 }

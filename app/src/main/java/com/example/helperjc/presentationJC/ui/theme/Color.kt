@@ -26,6 +26,7 @@ val ButtonSecondaryLight = Color(0xFF5F6368)
 val TextPrimaryLight = Color(0xFF202124)
 val TextSecondaryLight = Color(0xFF5F6368)
 val TextDisabledLight = Color(0xFF9AA0A6)
+val DeleteColor = Color(0xFFD32F2F)
 
 val ProgressFirstStep = Color(0xFFFF4444)
 val ProgressSecondStep = Color(0xFFFF8800)
