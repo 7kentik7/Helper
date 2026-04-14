@@ -26,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
@@ -43,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -206,7 +209,7 @@ private fun PlanItem(
                 Text(text = it, fontSize = 14.sp, color = MaterialTheme.colorScheme.secondary)
             }
             Text(text = planDetails.plan.title, fontSize = 18.sp)
-            ProgressBarForItemHelper(planDetails.progress)
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -214,6 +217,7 @@ private fun PlanItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
+                    ProgressBarForItemHelper(planDetails.progress)
                     Text(
                         text = stringResource(
                             id = R.string.tasks_count,
@@ -247,7 +251,8 @@ private fun PlanItem(
 
 @Composable
 fun ProgressBarForItemHelper(progress: Int) {
-    val progressFloat = progress / 100f
+  //  val progressFloat = progress / 100f
+    val progressFloat = 0.5f
 
     val color = when (progress) {
         in 0 until 20 -> {
@@ -269,26 +274,17 @@ fun ProgressBarForItemHelper(progress: Int) {
         in 80..100 -> {
             ProgressFifthStep
         }
-
-
         else -> {
             ProgressFirstStep
         }
     }
-    //TODO сделать нормальный прогресс бар
-    Box(
+    LinearProgressIndicator(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(4.dp)
-            .clip(RoundedCornerShape(50))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(progressFloat)
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(50))
-                .background(color)
-        )
-    }
+            .fillMaxWidth(),
+        progress = { progressFloat },
+        strokeCap = StrokeCap.Round,
+        gapSize = 6.dp,
+        color = color,
+        trackColor = MaterialTheme.colorScheme.surfaceVariant
+    )
 }

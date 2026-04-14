@@ -42,7 +42,5 @@ fun HelperNavGraph(
                 onSaveButtonClick = { navActions.navigateUp() }
             )
         }
-
-
     }
 }
