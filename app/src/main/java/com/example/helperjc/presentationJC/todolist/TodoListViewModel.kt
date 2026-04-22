@@ -29,7 +29,7 @@ class TodoListViewModel @Inject constructor(
                 val sortedList = tasks
                     .sortedWith(
                         compareBy<Task> {
-                            !it.isActive
+                            it.isCompleted
                         }.thenByDescending {
                             it.priority
                         }
@@ -48,7 +48,7 @@ class TodoListViewModel @Inject constructor(
     fun changeEnableState(task: Task) {
         viewModelScope.launch {
             val newTask = task.copy(
-                isActive = !task.isActive
+                isCompleted = !task.isCompleted
             )
             addEditTaskUseCase(newTask)
         }

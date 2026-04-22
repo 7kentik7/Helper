@@ -1,4 +1,4 @@
-package com.example.helperjc.presentationJC.ui.theme
+package com.example.helperjc.presentationJC.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -18,7 +18,7 @@ val TextDisabledDark = Color(0xFF5F6368)
 // ---------- LIGHT  ----------
 val BackgroundLight = Color(0xFFFFFFFF)
 val SurfaceLight = Color(0xFFF5F5F5)
-val SurfaceVariantLight = Color(0xFFE0E0E0)
+val SurfaceVariantLight = Color(0xDCE0E0E0)
 
 val ButtonColorLight = Color(0xFF3367D6)
 val ButtonSecondaryLight = Color(0xFF5F6368)
@@ -26,6 +26,7 @@ val ButtonSecondaryLight = Color(0xFF5F6368)
 val TextPrimaryLight = Color(0xFF202124)
 val TextSecondaryLight = Color(0xFF5F6368)
 val TextDisabledLight = Color(0xFF9AA0A6)
+val DeleteColor = Color(0xFFD32F2F)
 
 val ProgressFirstStep = Color(0xFFFF4444)
 val ProgressSecondStep = Color(0xFFFF8800)

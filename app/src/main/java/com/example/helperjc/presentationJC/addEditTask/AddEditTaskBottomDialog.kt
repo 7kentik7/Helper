@@ -1,5 +1,6 @@
-package com.example.helperjc.presentationJC
+package com.example.helperjc.presentationJC.addEditTask
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,13 +15,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,18 +36,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.enums.TaskPriority
-import com.example.helperjc.presentation.viewmodels.tasks.AddTaskViewModel
-import com.example.helperjc.presentationJC.ui.theme.HelperJCTheme
-import com.example.helperjc.presentationJC.ui.theme.PriorityHigh
-import com.example.helperjc.presentationJC.ui.theme.PriorityLow
-import com.example.helperjc.presentationJC.ui.theme.PriorityMedium
+import com.example.helperjc.presentationJC.theme.PriorityHigh
+import com.example.helperjc.presentationJC.theme.PriorityLow
+import com.example.helperjc.presentationJC.theme.PriorityMedium
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditTaskDialog(
     modifier: Modifier = Modifier,
     viewmodel: AddTaskViewModel = hiltViewModel(),
-    onDismissClick: () -> Unit
+    onDismissClick: () -> Unit,
+    onSaveButtonClick: () -> Unit
 ) {
     val state by viewmodel.state.collectAsStateWithLifecycle()
     ModalBottomSheet(onDismissRequest = onDismissClick) {
@@ -62,7 +60,27 @@ fun AddEditTaskDialog(
             )
         ) {
             val descriptionState = remember { mutableStateOf(false) }
-            TextFields(descriptionState)
+            TextField(
+                value = state.title,
+                onValueChange = viewmodel::onTitleChange,
+                label = { Text(stringResource(R.string.name)) },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(PaddingValues(start = 4.dp, end = 4.dp)),
+            )
+
+            if (descriptionState.value) {
+                TextField(
+                    value = state.description,
+                    onValueChange = viewmodel::onDescriptionChange,
+                    label = { Text(text = stringResource(R.string.description)) },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(PaddingValues(start = 4.dp, end = 4.dp)),
+                )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -83,107 +101,64 @@ fun AddEditTaskDialog(
                             tint = MaterialTheme.colorScheme.outline
                         )
                     }
-                    RadioButtonsPriority(task = Task(priority = TaskPriority.HIGH))
+                    RadioButtonsPriority(
+                        selected = state.priority,
+                        onSelected = viewmodel::onPriorityChange
+                    )
                 }
-
                 Text(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier
+                        .clickable(onClick = { if (viewmodel.onSaveButtonClick()) onSaveButtonClick() })
+                        .padding(8.dp),
                     text = stringResource(R.string.save),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
+
             }
         }
     }
 }
 
-@Composable
-private fun TextFields(
-    descriptionState: State<Boolean>,
-    onTitleChange: () -> Unit,
-    onDescriptionChange: () -> Unit,
-
-    ) {
-    TextField(
-        value = "",
-        onValueChange = { },
-        label = { Text(stringResource(R.string.name)) },
-        singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(PaddingValues(start = 4.dp, end = 4.dp)),
-    )
-
-    if (descriptionState.value) {
-        TextField(
-            value = "",
-            onValueChange = { },
-            label = { Text(text = stringResource(R.string.description)) },
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(PaddingValues(start = 4.dp, end = 4.dp)),
-        )
-    }
-}
 
 @Composable
-private fun RadioButtonsPriority(task: Task?, onOptionSelected: (TaskPriority) -> Unit) {
+private fun RadioButtonsPriority(
+    selected: TaskPriority,
+    onSelected: (TaskPriority) -> Unit
+) {
     val radioOptions = listOf(
         TaskPriority.LOW,
         TaskPriority.MEDIUM,
         TaskPriority.HIGH
     )
-    val (selectedOption, onOptionSelected) = remember {
-        mutableStateOf(task?.priority ?: TaskPriority.MEDIUM)
-    }
     Row(
-        modifier = Modifier,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         radioOptions.forEach { priority ->
-
             Row(
                 modifier = Modifier
                     .selectable(
-                        selected = (priority == selectedOption),
-                        onClick = { onOptionSelected(priority) },
+                        selected = (priority == selected),
+                        onClick = { onSelected(priority) },
                         role = Role.RadioButton
                     ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val radioButtonColorByPriority = when (priority) {
+                val color = when (priority) {
                     TaskPriority.LOW -> PriorityLow
                     TaskPriority.MEDIUM -> PriorityMedium
                     TaskPriority.HIGH -> PriorityHigh
                 }
+
                 RadioButton(
-                    modifier = Modifier.padding(5.dp),
-                    selected = priority == selectedOption,
+                    selected = priority == selected,
                     onClick = null,
                     colors = RadioButtonDefaults.colors(
-                        unselectedColor = radioButtonColorByPriority,
-                        selectedColor = radioButtonColorByPriority
+                        selectedColor = color,
+                        unselectedColor = color
                     )
                 )
             }
         }
-    }
-
-}
-
-@Preview
-@Composable
-fun PreviewAddEditTaskDialogDark() {
-    HelperJCTheme(darkTheme = true, dynamicColor = false) {
-//        AddEditTaskDialog()
-    }
-}
-
-@Preview
-@Composable
-fun PreviewAddEditTaskDialogLight() {
-    HelperJCTheme(darkTheme = false, dynamicColor = false) {
-//        AddEditTaskDialog()
     }
 }

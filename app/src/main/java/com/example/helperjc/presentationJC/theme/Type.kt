@@ -1,4 +1,4 @@
-package com.example.helperjc.presentationJC.ui.theme
+package com.example.helperjc.presentationJC.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

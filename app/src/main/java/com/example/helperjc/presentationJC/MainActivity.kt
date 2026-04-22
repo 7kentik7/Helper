@@ -3,8 +3,8 @@ package com.example.helperjc.presentationJC
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.helperjc.HelperNavGraph
-import com.example.helperjc.presentationJC.ui.theme.HelperJCTheme
+import com.example.helperjc.presentationJC.navigation.HelperNavGraph
+import com.example.helperjc.presentationJC.theme.HelperJCTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

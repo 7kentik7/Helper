@@ -1,4 +1,4 @@
-package com.example.helperjc.presentationJC.ui.theme
+package com.example.helperjc.presentationJC.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

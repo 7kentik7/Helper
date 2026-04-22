@@ -5,6 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.plans.usecases.AddEditPlanUseCase
 import com.example.helperjc.enums.PlanColor
+import com.example.helperjc.longToStringFormattedDate
+import com.example.helperjc.parseToString
+import com.example.helperjc.toDomain
+import com.example.helperjc.toLocalDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +19,7 @@ import javax.inject.Inject
 
 data class AddPlanState(
     val title: String = "",
-    val endTime: LocalDateTime? = null,
+    val endTime: String? = null,
     val color: PlanColor = PlanColor.Default
 )
 
@@ -27,19 +31,15 @@ class AddPlanViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
 
-    fun onSaveButtonClick(): Boolean {
-        _state.value.let {
-            if (it.title.isNotBlank()) {
-                val plan = Plan(
-                    title = it.title.trim(), endTime = it.endTime, color = it.color
-                )
-                viewModelScope.launch {
-                    addEditPlanUseCase(plan)
-                }
-                return true
-            } else {
-                return false
+    fun onSavePlanClick(): Boolean {
+        if (_state.value.title.isBlank()) {
+//            showSnackbarMessage(R.string.add_edit_task_screen_blank_title_error_message)
+            return false
+        } else {
+            viewModelScope.launch {
+                addEditPlanUseCase(_state.value.toDomain())
             }
+            return true
         }
     }
 
@@ -48,8 +48,8 @@ class AddPlanViewModel @Inject constructor(
         _state.update { it.copy(title = title) }
     }
 
-    fun onEndTimeChange(endTime: LocalDateTime) {
-        _state.update { it.copy(endTime = endTime) }
+    fun onEndTimeChange(endTime: Long) {
+        _state.update { it.copy(endTime = endTime.longToStringFormattedDate()) }
     }
 
     fun onEndTimeDelete() {

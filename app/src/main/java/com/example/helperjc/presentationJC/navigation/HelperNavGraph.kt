@@ -1,4 +1,4 @@
-package com.example.helperjc
+package com.example.helperjc.presentationJC.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -8,8 +8,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.helperjc.presentationJC.addEditPlan.AddEditPlanDialog
+import com.example.helperjc.presentationJC.addEditPlan.AddEditPlanScreen
+import com.example.helperjc.presentationJC.addEditTask.AddEditTaskDialog
 import com.example.helperjc.presentationJC.helper.HelperScreen
+import com.example.helperjc.presentationJC.todolist.TaskListScreen
 
 @Composable
 fun HelperNavGraph(
@@ -30,18 +32,31 @@ fun HelperNavGraph(
                 modifier = Modifier.fillMaxSize(),
                 onPlanItemClick = {},
                 onAddPlanClick = { navActions.navigateToAddEditPlan() },
-                onTasksClick = {},
+                onTasksClick = { navActions.navigateToTasksScreen() },
                 onNotesClick = {},
                 onAddTaskForPlanClick = {}
             )
         }
         composable(route = Screen.AddEditPlan.route) {
-            AddEditPlanDialog(
+            AddEditPlanScreen(
+                modifier = Modifier.fillMaxSize(),
+                onArrowBackClick = { navActions.navigateUp() },
+                onSaveButtonClick = { navActions.navigateUp() }
+            )
+        }
+        composable(route = Screen.TasksList.route) {
+            TaskListScreen(
+                modifier = Modifier.fillMaxSize(),
+                onBackArrowClick = { navActions.navigateUp() },
+                onAddTaskClick = { navActions.navigateToAddEditTask() }
+            )
+        }
+        composable(route = Screen.AddEditTask.route) {
+            AddEditTaskDialog(
+                modifier = Modifier.fillMaxSize(),
                 onDismissClick = { navActions.navigateUp() },
                 onSaveButtonClick = { navActions.navigateUp() }
             )
         }
-
-
     }
 }
