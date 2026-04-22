@@ -1,4 +1,4 @@
-package com.example.helperjc.presentation.viewmodels.tasks
+package com.example.helperjc.presentationJC.addEditTask
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -9,8 +9,6 @@ import com.example.helperjc.domain.tasks.usecases.AddEditTaskUseCase
 import com.example.helperjc.domain.tasks.usecases.GetTaskUseCase
 import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.presentation.states.tasks.AddTaskForPlanState
-
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -31,7 +29,7 @@ class AddTaskForPlanViewModel @Inject constructor(
                     id = taskId,
                     title = task?.title ?: "",
                     description = task?.description ?: "",
-                    isActive = task?.isActive ?: true,
+                    isActive = task?.isCompleted ?: true,
                     priority = task?.priority ?: TaskPriority.MEDIUM
                 )
             } ?: AddTaskForPlanState.DataLoaded()
@@ -45,7 +43,7 @@ class AddTaskForPlanViewModel @Inject constructor(
                     id = it.id,
                     title = it.title.trim(),
                     description = it.description.trim(),
-                    isActive = it.isActive,
+                    isCompleted = it.isActive,
                     priority = it.priority,
                     planId = planId
                 )

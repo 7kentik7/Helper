@@ -10,7 +10,7 @@ class TaskMapper @Inject constructor() {
         id = entity.id,
         title = entity.title,
         description = entity.description,
-        isActive = entity.isActive,
+        isActive = entity.isCompleted,
         priority = entity.priority.name,
         planId = entity.planId
     )
@@ -19,7 +19,7 @@ class TaskMapper @Inject constructor() {
         id = model.id,
         title = model.title,
         description = model.description,
-        isActive = model.isActive,
+        isCompleted = model.isActive,
         priority = TaskPriority.valueOf(model.priority)
     )
 

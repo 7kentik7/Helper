@@ -30,7 +30,7 @@ class PlanDetailsViewModel @Inject constructor(
                 getPlanDetailsUseCase(planId).collect { (plan, tasks, progress) ->
                     val sortedList = tasks.sortedWith(
                         compareBy<Task> {
-                            !it.isActive
+                            !it.isCompleted
                         }.thenByDescending {
                             it.priority
                         }
@@ -56,7 +56,7 @@ class PlanDetailsViewModel @Inject constructor(
         (_state.value as? PlanDetailsState.DataLoaded)?.let {
             viewModelScope.launch {
                 val newTask = task.copy(
-                    isActive = !task.isActive,
+                    isCompleted = !task.isCompleted,
                     planId = planId
                 )
                 addEditTaskUseCase(newTask)

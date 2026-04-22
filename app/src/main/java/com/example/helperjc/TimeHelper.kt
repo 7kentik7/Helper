@@ -21,10 +21,12 @@ fun LocalDateTime.parseToString(): String {
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
     return this.format(formatter)
 }
+
 fun String.parseToLocalDateTime(): LocalDateTime {
-    // Используем ТОТ ЖЕ шаблон, но обязательно указываем Locale,
-    // чтобы корректно парсились названия месяцев (например, "Dec")
-    val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
-    // Сначала парсим в LocalDate (так как времени нет), затем добавляем начало суток
+    val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale("ru"))
     return LocalDate.parse(this, formatter).atStartOfDay()
+}
+
+fun Long.longToStringFormattedDate(): String {
+    return this.toLocalDateTime().parseToString()
 }

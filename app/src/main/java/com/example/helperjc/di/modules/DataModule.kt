@@ -1,4 +1,4 @@
-package com.example.helperjc.di.modules
+package com.example.helperjc.di
 
 import android.app.Application
 import com.example.helperjc.data.database.AppDatabase

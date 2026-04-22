@@ -1,25 +1,34 @@
 package com.example.helperjc.presentationJC.addEditPlan
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
-import com.example.helperjc.parseToString
 
 
 @Composable
@@ -48,6 +56,7 @@ fun AddEditPlanScreen(
     onSaveButtonClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var showDatePicker by remember { mutableStateOf(false) }
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -71,42 +80,58 @@ fun AddEditPlanScreen(
                     .fillMaxWidth()
                     .padding(PaddingValues(start = 4.dp, end = 4.dp))
             )
-            var chipState by remember { mutableStateOf(false) }
-
-            InputChip(
-                onClick = {
-                    chipState = !chipState
-                },
-                label = { state.endTime },
-                selected = chipState,
-                trailingIcon = {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = null,
-                        Modifier
-                            .size(16.dp)
-                    )
-                }
-            )
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // 🔹 Дата (кликабельный блок)
+            OutlinedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 8.dp),
+                onClick = { showDatePicker = true }
             ) {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_more_time_24),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.DateRange, contentDescription = null)
+
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        text = state.endTime
+                            ?: "Выбрать дату",
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
+            AnimatedVisibility(visible = state.endTime != null) {
+                InputChip(
+                    selected = false,
+                    onClick = {},
+                    label = {
+                        Text(state.endTime ?: "")
+                    },
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = null,
+                            modifier = Modifier.clickable {
+                                viewModel.onEndTimeDelete()
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        // 🔹 DatePicker
+        if (showDatePicker) {
+            PlanDatePicker(
+                onDateSelected = { millis ->
+                    viewModel.onEndTimeChange(millis)
+                },
+                onDismiss = { showDatePicker = !showDatePicker }
+            )
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,6 +144,13 @@ private fun AppBar(
             containerColor = MaterialTheme.colorScheme.background
         ),
         actions = {
+            IconButton(onClick = {}) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_more_time_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
             IconButton(onClick = onSavePlanClick) {
                 Icon(
                     modifier = Modifier.size(24.dp),
@@ -145,4 +177,38 @@ private fun AppBar(
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PlanDatePicker(
+    onDateSelected: (Long) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = System.currentTimeMillis()
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        onDateSelected(it)
+                    }
+                    onDismiss()
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Отмена")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
 }

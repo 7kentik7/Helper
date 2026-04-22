@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.plans.usecases.AddEditPlanUseCase
 import com.example.helperjc.enums.PlanColor
+import com.example.helperjc.longToStringFormattedDate
 import com.example.helperjc.parseToString
 import com.example.helperjc.toDomain
+import com.example.helperjc.toLocalDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,8 +48,8 @@ class AddPlanViewModel @Inject constructor(
         _state.update { it.copy(title = title) }
     }
 
-    fun onEndTimeChange(endTime: LocalDateTime) {
-        _state.update { it.copy(endTime = endTime.parseToString()) }
+    fun onEndTimeChange(endTime: Long) {
+        _state.update { it.copy(endTime = endTime.longToStringFormattedDate()) }
     }
 
     fun onEndTimeDelete() {

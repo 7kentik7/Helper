@@ -1,4 +1,4 @@
-package com.example.helperjc.presentation.viewmodels.tasks
+package com.example.helperjc.presentationJC.addEditTask
 
 
 import androidx.lifecycle.ViewModel
@@ -18,7 +18,7 @@ data class AddTaskState(
     val id: Int = Task.UNDEFINED_ID,
     val title: String = "",
     val description: String = "",
-    val isActive: Boolean = true,
+    val isCompleted: Boolean = false,
     val priority: TaskPriority = TaskPriority.MEDIUM
 )
 
@@ -39,7 +39,7 @@ class AddTaskViewModel @Inject constructor(
                     id = taskId,
                     title = task?.title ?: "",
                     description = task?.description ?: "",
-                    isActive = task?.isActive ?: true,
+                    isCompleted = task?.isCompleted ?: true,
                     priority = task?.priority ?: TaskPriority.MEDIUM
                 )
             } ?: AddTaskState()
@@ -54,7 +54,7 @@ class AddTaskViewModel @Inject constructor(
                     id = it.id,
                     title = it.title.trim(),
                     description = it.description.trim(),
-                    isActive = it.isActive,
+                    isCompleted = it.isCompleted,
                     priority = it.priority,
                 )
                 viewModelScope.launch {

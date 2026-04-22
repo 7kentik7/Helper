@@ -5,9 +5,9 @@ import com.example.helperjc.domain.tasks.Task
 
 data class PlanDetails(
     val plan: Plan,
-    val tasks: List<Task>,
-    val progress: Int,
-    val countOfTasks: Int,
-    val countOfCompletedTasks: Int
+    val tasks: List<Task> = listOf(),
+    val progress: Int = 0,
+    val countOfTasks: Int = 0,
+    val countOfCompletedTasks: Int = 0
 ) {
 }

@@ -26,7 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
@@ -44,8 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,12 +54,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
 import com.example.helperjc.domain.plandetails.PlanDetails
 import com.example.helperjc.parseToString
-import com.example.helperjc.presentationJC.ui.theme.DeleteColor
-import com.example.helperjc.presentationJC.ui.theme.ProgressFifthStep
-import com.example.helperjc.presentationJC.ui.theme.ProgressFirstStep
-import com.example.helperjc.presentationJC.ui.theme.ProgressFourthStep
-import com.example.helperjc.presentationJC.ui.theme.ProgressSecondStep
-import com.example.helperjc.presentationJC.ui.theme.ProgressThirdStep
+import com.example.helperjc.presentationJC.theme.DeleteColor
+import com.example.helperjc.presentationJC.theme.ProgressFifthStep
+import com.example.helperjc.presentationJC.theme.ProgressFirstStep
+import com.example.helperjc.presentationJC.theme.ProgressFourthStep
+import com.example.helperjc.presentationJC.theme.ProgressSecondStep
+import com.example.helperjc.presentationJC.theme.ProgressThirdStep
 
 
 @Composable
@@ -94,34 +91,49 @@ fun HelperScreen(
             }
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(horizontal = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(state.planDetailsList, key = { it.plan.id }) { planDetails ->
-                val dismissState = rememberSwipeToDismissBoxState(
-                    confirmValueChange = { value ->
-                        if (value == SwipeToDismissBoxValue.EndToStart) {
-                            viewModel.deletePlan(planDetails)
-                            true
-                        } else false
-                    }
+        if (state.planDetailsList.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.emptyList),
+                    color = MaterialTheme.colorScheme.outline,
+                    fontSize = 20.sp
                 )
-
-                SwipeToDismissBox(
-                    modifier = Modifier.animateItem(),
-                    state = dismissState,
-                    backgroundContent = {
-                        DeleteBackground()
-                    }
-                ) {
-                    PlanItem(
-                        planDetails = planDetails,
-                        onPlanItemClick = onPlanItemClick,
-                        onAddTaskForPlanClick = onAddTaskForPlanClick
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(horizontal = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(state.planDetailsList, key = { it.plan.id }) { planDetails ->
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { value ->
+                            if (value == SwipeToDismissBoxValue.EndToStart) {
+                                viewModel.deletePlan(planDetails)
+                                true
+                            } else false
+                        }
                     )
+
+                    SwipeToDismissBox(
+                        modifier = Modifier.animateItem(),
+                        state = dismissState,
+                        backgroundContent = {
+                            DeleteBackground()
+                        }
+                    ) {
+                        PlanItem(
+                            planDetails = planDetails,
+                            onPlanItemClick = onPlanItemClick,
+                            onAddTaskForPlanClick = onAddTaskForPlanClick
+                        )
+                    }
                 }
             }
         }
@@ -129,7 +141,7 @@ fun HelperScreen(
 }
 
 @Composable
-fun DeleteBackground() {
+private fun DeleteBackground() {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -251,9 +263,7 @@ private fun PlanItem(
 
 @Composable
 fun ProgressBarForItemHelper(progress: Int) {
-  //  val progressFloat = progress / 100f
-    val progressFloat = 0.5f
-
+    val progressFloat = progress / 100f
     val color = when (progress) {
         in 0 until 20 -> {
             ProgressFirstStep
@@ -274,17 +284,25 @@ fun ProgressBarForItemHelper(progress: Int) {
         in 80..100 -> {
             ProgressFifthStep
         }
+
         else -> {
             ProgressFirstStep
         }
+
     }
-    LinearProgressIndicator(
+    Box(
         modifier = Modifier
-            .fillMaxWidth(),
-        progress = { progressFloat },
-        strokeCap = StrokeCap.Round,
-        gapSize = 6.dp,
-        color = color,
-        trackColor = MaterialTheme.colorScheme.surfaceVariant
-    )
+            .fillMaxWidth()
+            .height(4.dp)
+            .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(progressFloat)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(50))
+                .background(color)
+        )
+    }
 }
