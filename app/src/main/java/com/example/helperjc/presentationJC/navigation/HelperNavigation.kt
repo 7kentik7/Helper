@@ -15,9 +15,13 @@ sealed class Screen(val route: String) {
     }
 
     data object AddEditTask : Screen("addEditTask?taskId={taskId}") {
-        fun createRoute(taskId: Int?) =
-            if (taskId != null) "addEditPlan?taskId=$taskId"
-            else "addEditTask"
+        fun createRoute(taskId: Int? = null): String {
+            return if (taskId != null) {
+                "addEditTask?taskId=$taskId"
+            } else {
+                "addEditTask"
+            }
+        }
     }
 
     data object TasksList : Screen("tasksList")
@@ -36,7 +40,7 @@ class HelperNavigationActions(
         }
     }
 
-    fun navigateToAddEditTask(taskId: Int) {
+    fun navigateToAddEditTask(taskId: Int?=null) {
         navController.navigate(Screen.AddEditTask.createRoute(taskId)) {
             launchSingleTop = true
         }

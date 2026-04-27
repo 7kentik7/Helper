@@ -60,7 +60,8 @@ fun HelperNavGraph(
             TaskListScreen(
                 modifier = Modifier.fillMaxSize(),
                 onBackArrowClick = { navActions.navigateUp() },
-                onAddTaskClick = { navActions.navigateToAddEditTask(-1) }
+                onAddTaskClick = { navActions.navigateToAddEditTask() },
+                onTaskClick = { id -> navActions.navigateToAddEditTask(id) }
             )
         }
         composable(route = Screen.AddEditTask.route) {

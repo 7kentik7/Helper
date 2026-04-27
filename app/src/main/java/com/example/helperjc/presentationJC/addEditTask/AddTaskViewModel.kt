@@ -1,12 +1,14 @@
 package com.example.helperjc.presentationJC.addEditTask
 
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.domain.tasks.usecases.AddEditTaskUseCase
 import com.example.helperjc.domain.tasks.usecases.GetTaskUseCase
 import com.example.helperjc.enums.TaskPriority
+import com.example.helperjc.toDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class AddTaskState(
-    val id: Int = Task.UNDEFINED_ID,
+    val id: String? = null,
     val title: String = "",
     val description: String = "",
     val isCompleted: Boolean = false,
@@ -25,16 +27,21 @@ data class AddTaskState(
 @HiltViewModel
 class AddTaskViewModel @Inject constructor(
     private val addEditTaskUseCase: AddEditTaskUseCase,
-    private val getTaskUseCase: GetTaskUseCase
+    private val getTaskUseCase: GetTaskUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
+    private val taskId: String? = savedStateHandle["taskId"]
     private val _state = MutableStateFlow(AddTaskState())
     val state = _state.asStateFlow()
 
-    fun loadData(taskId: Int?) {
+    init {
+        loadData(taskId)
+    }
+
+    fun loadData(taskId: String?) {
         viewModelScope.launch {
             _state.value = taskId?.let { taskId ->
-                val task = getTaskUseCase(taskId)
+                val task = getTaskUseCase(taskId.toInt())
                 AddTaskState(
                     id = taskId,
                     title = task?.title ?: "",
@@ -47,26 +54,15 @@ class AddTaskViewModel @Inject constructor(
     }
 
     fun onSaveButtonClick(): Boolean {
-        _state.value.let {
-
-            if (it.title.isNotBlank()) {
-                val task = Task(
-                    id = it.id,
-                    title = it.title.trim(),
-                    description = it.description.trim(),
-                    isCompleted = it.isCompleted,
-                    priority = it.priority,
-                )
-                viewModelScope.launch {
-                    addEditTaskUseCase(task)
-                }
-                return true
-
-            } else {
-                val oldState = _state.value
-                _state.value = oldState
-                return false
+        if (_state.value.title.isBlank()) {
+            val oldState = _state.value
+            _state.value = oldState
+            return false
+        } else {
+            viewModelScope.launch {
+                addEditTaskUseCase(_state.value.toDomain())
             }
+            return true
         }
     }
 

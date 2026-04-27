@@ -1,4 +1,4 @@
-package com.example.helperjc.di.modules
+package com.example.helperjc
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
