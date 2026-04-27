@@ -6,6 +6,7 @@ import com.example.helperjc.presentationJC.addEditPlan.AddPlanState
 
 fun AddPlanState.toDomain(): Plan =
     Plan(
+        id = this.planId?.toInt() ?: Plan.UNDEFINED_ID,
         title = this.title.trim(),
         color = this.color,
         endTime = this.endTime?.parseToLocalDateTime()

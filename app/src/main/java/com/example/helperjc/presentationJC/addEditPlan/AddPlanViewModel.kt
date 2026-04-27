@@ -1,12 +1,16 @@
 package com.example.helperjc.presentationJC.addEditPlan
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.plans.usecases.AddEditPlanUseCase
+import com.example.helperjc.domain.plans.usecases.GetPlanUseCase
 import com.example.helperjc.enums.PlanColor
+import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.longToStringFormattedDate
 import com.example.helperjc.parseToString
+import com.example.helperjc.presentationJC.addEditTask.AddTaskState
 import com.example.helperjc.toDomain
 import com.example.helperjc.toLocalDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +22,7 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 
 data class AddPlanState(
+    val planId: String? = null,
     val title: String = "",
     val endTime: String? = null,
     val color: PlanColor = PlanColor.Default
@@ -25,15 +30,34 @@ data class AddPlanState(
 
 @HiltViewModel
 class AddPlanViewModel @Inject constructor(
-    val addEditPlanUseCase: AddEditPlanUseCase
+    val addEditPlanUseCase: AddEditPlanUseCase,
+    val getPlanUseCase: GetPlanUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    private val planId: String? = savedStateHandle["planId"]
     private val _state = MutableStateFlow(AddPlanState())
     val state = _state.asStateFlow()
 
+    init {
+        loadData(planId)
+    }
+
+    fun loadData(planId: String?) {
+        viewModelScope.launch {
+            _state.value = planId?.let { planId ->
+                val plan = getPlanUseCase(planId.toInt())
+                AddPlanState(
+                    planId = planId,
+                    title = plan?.title ?: "",
+                    endTime = plan?.endTime?.parseToString(),
+                    color = plan?.color ?: PlanColor.Default
+                )
+            } ?: AddPlanState()
+        }
+    }
 
     fun onSavePlanClick(): Boolean {
         if (_state.value.title.isBlank()) {
-//            showSnackbarMessage(R.string.add_edit_task_screen_blank_title_error_message)
             return false
         } else {
             viewModelScope.launch {

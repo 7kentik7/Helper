@@ -5,9 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.helperjc.presentationJC.addEditPlan.AddEditPlanScreen
 import com.example.helperjc.presentationJC.addEditTask.AddEditTaskDialog
 import com.example.helperjc.presentationJC.helper.HelperScreen
@@ -30,14 +32,24 @@ fun HelperNavGraph(
         composable(route = Screen.Helper.route) {
             HelperScreen(
                 modifier = Modifier.fillMaxSize(),
-                onPlanItemClick = {},
+                onPlanItemClick = { id -> navActions.navigateToAddEditPlan(id) },
                 onAddPlanClick = { navActions.navigateToAddEditPlan() },
                 onTasksClick = { navActions.navigateToTasksScreen() },
                 onNotesClick = {},
                 onAddTaskForPlanClick = {}
             )
         }
-        composable(route = Screen.AddEditPlan.route) {
+        composable(
+            route = Screen.AddEditPlan.route,
+            arguments = listOf(
+                navArgument("planId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
+
             AddEditPlanScreen(
                 modifier = Modifier.fillMaxSize(),
                 onArrowBackClick = { navActions.navigateUp() },
@@ -48,7 +60,7 @@ fun HelperNavGraph(
             TaskListScreen(
                 modifier = Modifier.fillMaxSize(),
                 onBackArrowClick = { navActions.navigateUp() },
-                onAddTaskClick = { navActions.navigateToAddEditTask() }
+                onAddTaskClick = { navActions.navigateToAddEditTask(-1) }
             )
         }
         composable(route = Screen.AddEditTask.route) {
