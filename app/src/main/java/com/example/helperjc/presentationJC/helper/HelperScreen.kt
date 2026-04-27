@@ -70,7 +70,7 @@ fun HelperScreen(
     onNotesClick: () -> Unit,
     onPlanItemClick: (Int) -> Unit,
     onAddPlanClick: () -> Unit,
-    onAddTaskForPlanClick: (PlanDetails) -> Unit
+    onAddTaskForPlanClick: (Int) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(
@@ -108,7 +108,8 @@ fun HelperScreen(
             LazyColumn(
                 modifier = Modifier
                     .padding(innerPadding)
-                    .padding(horizontal = 10.dp),
+                    .padding(horizontal = 10.dp)
+                    .fillMaxHeight(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(state.planDetailsList, key = { it.plan.id }) { planDetails ->
@@ -199,7 +200,7 @@ private fun PlanItem(
     innerPadding: PaddingValues = PaddingValues(),
     planDetails: PlanDetails,
     onPlanItemClick: (Int) -> Unit,
-    onAddTaskForPlanClick: (PlanDetails) -> Unit
+    onAddTaskForPlanClick: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -248,7 +249,7 @@ private fun PlanItem(
                     )
                 }
 
-                IconButton(onClick = { onAddTaskForPlanClick(planDetails) }) {
+                IconButton(onClick = { onAddTaskForPlanClick(planDetails.plan.id) }) {
                     Icon(
                         painter = painterResource(R.drawable.add_task),
                         contentDescription = null,

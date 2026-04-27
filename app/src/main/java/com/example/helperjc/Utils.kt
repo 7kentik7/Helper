@@ -2,7 +2,9 @@ package com.example.helperjc
 
 import androidx.compose.ui.graphics.Color
 import com.example.helperjc.domain.plans.Plan
+import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.presentationJC.addEditPlan.AddPlanState
+import com.example.helperjc.presentationJC.addEditTask.AddTaskState
 
 fun AddPlanState.toDomain(): Plan =
     Plan(
@@ -10,6 +12,15 @@ fun AddPlanState.toDomain(): Plan =
         title = this.title.trim(),
         color = this.color,
         endTime = this.endTime?.parseToLocalDateTime()
+    )
+
+fun AddTaskState.toDomain(): Task =
+    Task(
+        id = this.id?.toInt() ?: Task.UNDEFINED_ID,
+        title = this.title.trim(),
+        description = this.description,
+        isCompleted = this.isCompleted,
+        priority = this.priority,
     )
 
 fun Color.muted(amount: Float = 0.35f): Color {

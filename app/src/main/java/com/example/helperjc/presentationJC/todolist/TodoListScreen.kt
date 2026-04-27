@@ -60,7 +60,8 @@ fun TaskListScreen(
     modifier: Modifier = Modifier,
     viewModel: TodoListViewModel = hiltViewModel(),
     onBackArrowClick: () -> Unit,
-    onAddTaskClick: () -> Unit
+    onAddTaskClick: () -> Unit,
+    onTaskClick: (Int) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(
@@ -117,7 +118,8 @@ fun TaskListScreen(
                     ) {
                         TaskItem(
                             taskItem = task,
-                            changeEnabledState = { viewModel.changeEnableState(task) }
+                            changeEnabledState = { viewModel.changeEnableState(task) },
+                            onTaskClick = onTaskClick
                         )
                     }
                 }
@@ -149,7 +151,8 @@ fun DeleteBackground(taskItem: Task) {
 @Composable
 fun TaskItem(
     taskItem: Task,
-    changeEnabledState: () -> Unit
+    changeEnabledState: () -> Unit,
+    onTaskClick: (Int) -> Unit
 ) {
     val colorByPriority = when (taskItem.priority) {
         TaskPriority.LOW -> PriorityLow
@@ -168,7 +171,7 @@ fun TaskItem(
                     MaterialTheme.colorScheme.surface
                 else MaterialTheme.colorScheme.surface.muted()
         ),
-        onClick = {}
+        onClick = { onTaskClick(taskItem.id) }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
