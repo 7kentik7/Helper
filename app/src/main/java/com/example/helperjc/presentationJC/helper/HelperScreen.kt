@@ -68,7 +68,7 @@ fun HelperScreen(
     viewModel: HelperViewModel = hiltViewModel(),
     onTasksClick: () -> Unit,
     onNotesClick: () -> Unit,
-    onPlanItemClick: (PlanDetails) -> Unit,
+    onPlanItemClick: (Int) -> Unit,
     onAddPlanClick: () -> Unit,
     onAddTaskForPlanClick: (PlanDetails) -> Unit
 ) {
@@ -198,7 +198,7 @@ private fun AppBar(
 private fun PlanItem(
     innerPadding: PaddingValues = PaddingValues(),
     planDetails: PlanDetails,
-    onPlanItemClick: (PlanDetails) -> Unit,
+    onPlanItemClick: (Int) -> Unit,
     onAddTaskForPlanClick: (PlanDetails) -> Unit
 ) {
     Card(
@@ -210,7 +210,7 @@ private fun PlanItem(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        onClick = { onPlanItemClick(planDetails) }
+        onClick = { onPlanItemClick(planDetails.plan.id) }
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
 

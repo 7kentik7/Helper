@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
+import com.example.helperjc.domain.plans.Plan
 
 
 @Composable
@@ -80,7 +81,6 @@ fun AddEditPlanScreen(
                     .fillMaxWidth()
                     .padding(PaddingValues(start = 4.dp, end = 4.dp))
             )
-            // 🔹 Дата (кликабельный блок)
             OutlinedCard(
                 modifier = Modifier
                     .fillMaxWidth()
