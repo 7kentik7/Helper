@@ -1,12 +1,12 @@
 package com.example.helperjc.presentationJC.addEditPlan
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.plans.usecases.AddEditPlanUseCase
 import com.example.helperjc.domain.plans.usecases.GetPlanUseCase
-import com.example.helperjc.enums.PlanColor
 import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.longToStringFormattedDate
 import com.example.helperjc.parseToString
@@ -25,7 +25,7 @@ data class AddPlanState(
     val planId: String? = null,
     val title: String = "",
     val endTime: String? = null,
-    val color: PlanColor = PlanColor.Default
+    val color: Color = Color.Gray
 )
 
 @HiltViewModel
@@ -50,7 +50,7 @@ class AddPlanViewModel @Inject constructor(
                     planId = planId,
                     title = plan?.title ?: "",
                     endTime = plan?.endTime?.parseToString(),
-                    color = plan?.color ?: PlanColor.Default
+                    color = plan?.color ?: Color.Gray
                 )
             } ?: AddPlanState()
         }
@@ -80,7 +80,7 @@ class AddPlanViewModel @Inject constructor(
         _state.update { it.copy(endTime = null) }
     }
 
-    fun onColorChanged(color: PlanColor) {
+    fun onColorChanged(color: Color) {
         _state.update { it.copy(color = color) }
     }
 }

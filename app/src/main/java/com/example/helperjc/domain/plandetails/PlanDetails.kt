@@ -8,6 +8,6 @@ data class PlanDetails(
     val tasks: List<Task> = listOf(),
     val progress: Int = 0,
     val countOfTasks: Int = 0,
-    val countOfCompletedTasks: Int = 0
+    val countOfCompletedTasks: Int = 0,
 ) {
 }

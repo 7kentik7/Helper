@@ -70,7 +70,8 @@ fun AddEditPlanScreen(
         modifier = modifier, topBar = {
             AppBar(
                 onSavePlanClick = { if (viewModel.onSavePlanClick()) onSaveButtonClick() },
-                onArrowBackClick = onArrowBackClick
+                onArrowBackClick = onArrowBackClick,
+                onColorPeekerClick = { showColorPicker = true }
             )
         }) { paddingValues ->
         Column(
@@ -121,13 +122,13 @@ fun AddEditPlanScreen(
         ColorPeeker(
             showColorDialog = showColorPicker,
             onPlanColorChange = { viewModel.onColorChanged(state.color) },
-            onDismiss = { !showColorPicker }
+            onDismiss = { showColorPicker = !showColorPicker }
         )
 
         if (showDatePicker) {
             PlanDatePicker(onDateSelected = { millis ->
                 viewModel.onEndTimeChange(millis)
-            }, onDismiss = { !showDatePicker })
+            }, onDismiss = { showDatePicker = !showDatePicker })
         }
     }
 }
@@ -135,7 +136,9 @@ fun AddEditPlanScreen(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ColorPeeker(
-    showColorDialog: Boolean, onPlanColorChange: (Color) -> Unit, onDismiss: () -> Unit
+    showColorDialog: Boolean,
+    onPlanColorChange: (Color) -> Unit,
+    onDismiss: () -> Unit
 ) {
 
     ColorPickerDialog(
@@ -154,13 +157,15 @@ private fun ColorPeeker(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppBar(
-    onSavePlanClick: () -> Unit, onArrowBackClick: () -> Unit
+    onSavePlanClick: () -> Unit,
+    onArrowBackClick: () -> Unit,
+    onColorPeekerClick: () -> Unit
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
         ), actions = {
-            IconButton(onClick = {}) {
+            IconButton(onClick = onColorPeekerClick) {
                 Icon(
                     painter = painterResource(R.drawable.baseline_more_time_24),
                     contentDescription = null,
@@ -195,7 +200,8 @@ private fun AppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanDatePicker(
-    onDateSelected: (Long) -> Unit, onDismiss: () -> Unit
+    onDateSelected: (Long) -> Unit,
+    onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = System.currentTimeMillis()

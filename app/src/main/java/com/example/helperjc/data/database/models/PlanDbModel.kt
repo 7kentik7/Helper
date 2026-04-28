@@ -11,5 +11,5 @@ data class PlanDbModel(
     val repeatAt: String,
     val startTime: Long,
     val endTime: Long?,
-    val color: String
+    val color: Long
 )

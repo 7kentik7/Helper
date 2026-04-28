@@ -207,7 +207,7 @@ private fun PlanItem(
             .fillMaxWidth()
             .padding(innerPadding),
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, color = Color.Cyan),
+        border = BorderStroke(1.dp, color = planDetails.plan.color),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
