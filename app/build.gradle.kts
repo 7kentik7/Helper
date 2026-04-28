@@ -76,5 +76,5 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
-    implementation("com.github.skydoves:colorpicker-compose:1.1.2")
+    implementation("io.mhssn:colorpicker:1.0.0")
 }
