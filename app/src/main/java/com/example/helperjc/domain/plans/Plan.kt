@@ -1,5 +1,6 @@
 package com.example.helperjc.domain.plans
 
+import androidx.compose.ui.graphics.Color
 import com.example.helperjc.enums.PlanColor
 import com.example.helperjc.enums.PlanRepeatType
 import java.time.LocalDateTime
@@ -12,7 +13,7 @@ data class Plan @Inject constructor(
     val startTime: LocalDateTime = LocalDateTime.now(),
     val endTime: LocalDateTime? = null,
     val repeatAt: PlanRepeatType = PlanRepeatType.NONE,
-    val color: PlanColor = PlanColor.Default
+    val color: Color
 ) {
     companion object {
         const val UNDEFINED_ID = 0
