@@ -1,7 +1,9 @@
 package com.example.helperjc.presentationJC.helper
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -195,6 +197,7 @@ private fun AppBar(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PlanItem(
     innerPadding: PaddingValues = PaddingValues(),
@@ -205,13 +208,16 @@ private fun PlanItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(innerPadding),
+            .padding(innerPadding)
+            .combinedClickable(
+                onLongClick = { onPlanItemClick(planDetails.plan.id) },
+                onClick = {}
+            ),
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, color = planDetails.plan.color),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        ),
-        onClick = { onPlanItemClick(planDetails.plan.id) }
+        )
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
 

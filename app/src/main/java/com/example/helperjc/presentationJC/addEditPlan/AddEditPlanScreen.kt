@@ -1,11 +1,15 @@
 package com.example.helperjc.presentationJC.addEditPlan
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -121,7 +126,7 @@ fun AddEditPlanScreen(
         }
         ColorPeeker(
             showColorDialog = showColorPicker,
-            onPlanColorChange = { viewModel.onColorChanged(state.color) },
+            onPlanColorChange = viewModel::onColorChanged,
             onDismiss = { showColorPicker = !showColorPicker }
         )
 
@@ -131,27 +136,6 @@ fun AddEditPlanScreen(
             }, onDismiss = { showDatePicker = !showDatePicker })
         }
     }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-private fun ColorPeeker(
-    showColorDialog: Boolean,
-    onPlanColorChange: (Color) -> Unit,
-    onDismiss: () -> Unit
-) {
-
-    ColorPickerDialog(
-        show = showColorDialog,
-        type = ColorPickerType.Ring(
-            ringWidth = 10.dp, previewRadius = 80.dp, showAlphaBar = true, showColorPreview = true
-        ),
-        properties = DialogProperties(),
-        onDismissRequest = onDismiss,
-        onPickedColor = {
-            onPlanColorChange(it)
-        },
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -195,6 +179,32 @@ private fun AppBar(
                 )
             }
         })
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun ColorPeeker(
+    showColorDialog: Boolean,
+    onPlanColorChange: (Color) -> Unit,
+    onDismiss: () -> Unit
+) {
+    ColorPickerDialog(
+        show = showColorDialog,
+        type = ColorPickerType.Ring(
+            ringWidth = 10.dp,
+            previewRadius = 80.dp,
+            showAlphaBar = false,
+            showColorPreview = true,
+            showLightnessBar = false,
+            showDarknessBar = true
+        ),
+        properties = DialogProperties(),
+        onDismissRequest = onDismiss,
+        onPickedColor = {
+            onPlanColorChange(it)
+            onDismiss()
+        },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

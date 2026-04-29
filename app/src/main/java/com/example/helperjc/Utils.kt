@@ -5,6 +5,7 @@ import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.presentationJC.addEditPlan.AddPlanState
 import com.example.helperjc.presentationJC.addEditTask.AddTaskState
+import androidx.core.graphics.toColorInt
 
 fun AddPlanState.toDomain(): Plan =
     Plan(
@@ -31,4 +32,14 @@ fun Color.muted(amount: Float = 0.35f): Color {
         blue = blue * (1 - amount) + gray.blue * amount,
         alpha = 1f
     )
+}
+fun Color.toHex(): String {
+    val r = (red * 255).toInt()
+    val g = (green * 255).toInt()
+    val b = (blue * 255).toInt()
+    val a = (alpha * 255).toInt()
+    return String.format("#%02X%02X%02X%02X", a, r, g, b)
+}
+fun String.toColor(): Color {
+    return Color(this.toColorInt())
 }

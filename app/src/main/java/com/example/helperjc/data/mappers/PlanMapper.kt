@@ -4,6 +4,8 @@ import androidx.compose.ui.graphics.Color
 import com.example.helperjc.data.database.models.PlanDbModel
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.enums.PlanRepeatType
+import com.example.helperjc.toColor
+import com.example.helperjc.toHex
 import com.example.helperjc.toLocalDateTime
 import com.example.helperjc.toTimeInMillis
 import javax.inject.Inject
@@ -15,7 +17,7 @@ class PlanMapper @Inject constructor() {
         startTime = entity.startTime.toTimeInMillis(),
         endTime = entity.endTime?.toTimeInMillis(),
         repeatAt = entity.repeatAt.name,
-        color = entity.color.value.toLong()
+        color = entity.color.toHex()
     )
 
     fun mapModelToEntity(model: PlanDbModel): Plan = Plan(
@@ -24,6 +26,6 @@ class PlanMapper @Inject constructor() {
         startTime = model.startTime.toLocalDateTime(),
         endTime = model.endTime?.toLocalDateTime(),
         repeatAt = PlanRepeatType.valueOf(model.repeatAt),
-        color = Color(model.color)
+        color = model.color.toColor()
     )
 }
