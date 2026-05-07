@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import com.example.helperjc.presentationJC.addEditPlan.AddEditPlanScreen
 import com.example.helperjc.presentationJC.addEditTask.AddEditTaskDialog
 import com.example.helperjc.presentationJC.helper.HelperScreen
+import com.example.helperjc.presentationJC.plandetails.PlanDetailsScreen
 import com.example.helperjc.presentationJC.todolist.TaskListScreen
 
 @Composable
@@ -32,11 +33,12 @@ fun HelperNavGraph(
         composable(route = Screen.Helper.route) {
             HelperScreen(
                 modifier = Modifier.fillMaxSize(),
-                onPlanItemClick = { id -> navActions.navigateToAddEditPlan(id) },
+                onPlanItemClick = { id -> navActions.navigateToPlanDetailsScreen(planId = id) },
                 onAddPlanClick = { navActions.navigateToAddEditPlan() },
                 onTasksClick = { navActions.navigateToTasksScreen() },
                 onNotesClick = {},
-                onAddTaskForPlanClick = {}
+                onAddTaskForPlanClick = { id -> navActions.navigateToAddEditTask(planId = id) },
+                onPlanItemLongClick = { id -> navActions.navigateToAddEditPlan(id) }
             )
         }
         composable(
@@ -61,14 +63,50 @@ fun HelperNavGraph(
                 modifier = Modifier.fillMaxSize(),
                 onBackArrowClick = { navActions.navigateUp() },
                 onAddTaskClick = { navActions.navigateToAddEditTask() },
-                onTaskClick = { id -> navActions.navigateToAddEditTask(id) }
+                onTaskClick = { id -> navActions.navigateToAddEditTask(taskId = id) }
             )
         }
-        composable(route = Screen.AddEditTask.route) {
+        composable(
+            route = Screen.AddEditTask.route, arguments = listOf(
+                navArgument("planId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }, navArgument("taskId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )) {
             AddEditTaskDialog(
                 modifier = Modifier.fillMaxSize(),
                 onDismissClick = { navActions.navigateUp() },
                 onSaveButtonClick = { navActions.navigateUp() }
+            )
+        }
+        composable(
+            route = Screen.PlanDetailsScreen.route, arguments = listOf(
+                navArgument("planId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument("taskId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )) {
+            PlanDetailsScreen(
+                modifier = Modifier.fillMaxSize(),
+                onBackArrowClick = { navActions.navigateUp() },
+                onAddTaskClick = { id -> navActions.navigateToAddEditTask(planId = id) },
+                onTaskClick = { taskId, planId ->
+                    navActions.navigateToAddEditTask(
+                        taskId = taskId,
+                        planId = planId
+                    )
+                }
             )
         }
     }

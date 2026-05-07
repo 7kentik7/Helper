@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.helperjc.domain.plandetails.PlanDetails
 import com.example.helperjc.domain.plandetails.usecases.GetListPlanDetailsUseCase
 import com.example.helperjc.domain.plans.usecases.DeletePlanUseCase
+import com.example.helperjc.notifications.NotificationScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,8 @@ data class HelperState(val planDetailsList: List<PlanDetails> = emptyList())
 @HiltViewModel
 class HelperViewModel @Inject constructor(
     private val getListPlanDetailsUseCase: GetListPlanDetailsUseCase,
-    private val deletePlanUseCase: DeletePlanUseCase
+    private val deletePlanUseCase: DeletePlanUseCase,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
     private val _state = MutableStateFlow(HelperState())
     val state = _state.asStateFlow()
@@ -32,6 +34,7 @@ class HelperViewModel @Inject constructor(
     fun deletePlan(planDetails: PlanDetails) {
         val plan = planDetails.plan
         viewModelScope.launch {
+            notificationScheduler.cancelNotification(plan.id)
             deletePlanUseCase(plan.id)
         }
     }

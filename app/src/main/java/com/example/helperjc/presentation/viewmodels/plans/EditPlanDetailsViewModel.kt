@@ -1,12 +1,12 @@
 package com.example.helperjc.presentation.viewmodels.plans
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.helperjc.R
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.plans.usecases.AddEditPlanUseCase
 import com.example.helperjc.domain.plans.usecases.GetPlanUseCase
-import com.example.helperjc.enums.PlanColor
 import com.example.helperjc.enums.PlanRepeatType
 import com.example.helperjc.presentation.states.plans.EditPlanDetailsState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +29,7 @@ class EditPlanDetailsViewModel @Inject constructor(
                 EditPlanDetailsState.DataLoaded(
                     id = planId,
                     title = plan?.title ?: "",
-                    color = plan?.color ?: PlanColor.Default,
+                    color = plan?.color ?: Color.Gray,
                     endTime = plan?.endTime,
                     startTime = plan?.startTime ?: LocalDateTime.now(),
                     repeatAt = plan?.repeatAt ?: PlanRepeatType.NONE
@@ -61,7 +61,7 @@ class EditPlanDetailsViewModel @Inject constructor(
         }
     }
 
-    fun onColorChanged(color: PlanColor) {
+    fun onColorChanged(color: Color) {
         (_state.value as? EditPlanDetailsState.DataLoaded)?.let {
             _state.value = it.copy(color = color)
         }

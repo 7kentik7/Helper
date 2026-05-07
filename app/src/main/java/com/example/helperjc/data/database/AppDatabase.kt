@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.helperjc.data.database.models.PlanDbModel
 import com.example.helperjc.data.database.models.TaskDbModel
 
-@Database(entities = [TaskDbModel::class, PlanDbModel::class], version = 10, exportSchema = false)
+@Database(entities = [TaskDbModel::class, PlanDbModel::class], version = 13, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun planDao(): PlanDao

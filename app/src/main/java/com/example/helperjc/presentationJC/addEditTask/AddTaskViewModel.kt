@@ -21,7 +21,8 @@ data class AddTaskState(
     val title: String = "",
     val description: String = "",
     val isCompleted: Boolean = false,
-    val priority: TaskPriority = TaskPriority.MEDIUM
+    val priority: TaskPriority = TaskPriority.MEDIUM,
+    val planId: String? = null
 )
 
 @HiltViewModel
@@ -31,14 +32,15 @@ class AddTaskViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val taskId: String? = savedStateHandle["taskId"]
+    private val planId: String? = savedStateHandle["planId"]
     private val _state = MutableStateFlow(AddTaskState())
     val state = _state.asStateFlow()
 
     init {
-        loadData(taskId)
+        loadData(taskId, planId)
     }
 
-    fun loadData(taskId: String?) {
+    fun loadData(taskId: String?, planId: String?) {
         viewModelScope.launch {
             _state.value = taskId?.let { taskId ->
                 val task = getTaskUseCase(taskId.toInt())
@@ -47,9 +49,10 @@ class AddTaskViewModel @Inject constructor(
                     title = task?.title ?: "",
                     description = task?.description ?: "",
                     isCompleted = task?.isCompleted ?: true,
-                    priority = task?.priority ?: TaskPriority.MEDIUM
+                    priority = task?.priority ?: TaskPriority.MEDIUM,
+                    planId = task?.planId?.toString() ?: planId
                 )
-            } ?: AddTaskState()
+            } ?: AddTaskState(planId = planId)
         }
     }
 

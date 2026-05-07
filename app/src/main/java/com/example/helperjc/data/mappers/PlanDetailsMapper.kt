@@ -15,7 +15,7 @@ class PlanDetailsMapper @Inject constructor(
         val taskListEntity = taskMapper.mapListModelToListEntity(model.tasks)
         val progress = countProgress(taskListEntity)
         val countOfTasks = taskListEntity.count()
-        val countOfCompletedTasks = taskListEntity.count { !it.isCompleted }
+        val countOfCompletedTasks = taskListEntity.count { it.isCompleted }
         return PlanDetails(
             planEntity,
             taskListEntity,
@@ -33,7 +33,7 @@ class PlanDetailsMapper @Inject constructor(
 
     private fun countProgress(tasks: List<Task>): Int {
         val totalWeight = tasks.sumOf { getWeight(it.priority) }
-        val completedWeight = tasks.filter { !it.isCompleted }.sumOf { getWeight(it.priority) }
+        val completedWeight = tasks.filter { it.isCompleted }.sumOf { getWeight(it.priority) }
         return if (totalWeight != 0) {
             ((completedWeight.toDouble() / totalWeight) * 100).toInt()
         } else {
