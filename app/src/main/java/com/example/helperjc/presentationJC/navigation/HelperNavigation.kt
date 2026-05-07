@@ -13,13 +13,30 @@ sealed class Screen(val route: String) {
             }
         }
     }
-
-    data object AddEditTask : Screen("addEditTask?taskId={taskId}") {
-        fun createRoute(taskId: Int? = null): String {
-            return if (taskId != null) {
-                "addEditTask?taskId=$taskId"
+    data object PlanDetailsScreen : Screen("planDetailsScreen?planId={planId}") {
+        fun createRoute(planId: Int? = null): String {
+            return if (planId != null) {
+                "planDetailsScreen?planId=$planId"
             } else {
+                "planDetailsScreen"
+            }
+        }
+    }
+
+    data object AddEditTask : Screen("addEditTask?taskId={taskId}&planId={planId}") {
+        fun createRoute(
+            taskId: Int? = null,
+            planId: Int? = null
+        ): String {
+            val params = mutableListOf<String>()
+
+            taskId?.let { params.add("taskId=$it") }
+            planId?.let { params.add("planId=$it") }
+
+            return if (params.isEmpty()) {
                 "addEditTask"
+            } else {
+                "addEditTask?${params.joinToString("&")}"
             }
         }
     }
@@ -40,14 +57,19 @@ class HelperNavigationActions(
         }
     }
 
-    fun navigateToAddEditTask(taskId: Int?=null) {
-        navController.navigate(Screen.AddEditTask.createRoute(taskId)) {
+    fun navigateToAddEditTask(taskId: Int? = null, planId: Int? = null) {
+        navController.navigate(Screen.AddEditTask.createRoute(taskId, planId)) {
             launchSingleTop = true
         }
     }
 
     fun navigateToTasksScreen() {
         navController.navigate(Screen.TasksList.route) {
+            launchSingleTop = true
+        }
+    }
+    fun navigateToPlanDetailsScreen(planId: Int? = null) {
+        navController.navigate(Screen.PlanDetailsScreen.createRoute(planId)) {
             launchSingleTop = true
         }
     }

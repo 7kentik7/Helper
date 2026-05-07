@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.helperjc.R
+import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.domain.tasks.usecases.AddEditTaskUseCase
 import com.example.helperjc.domain.tasks.usecases.GetTaskUseCase
@@ -36,7 +37,7 @@ class AddTaskForPlanViewModel @Inject constructor(
         }
     }
 
-    fun onSaveButtonClick(planId: Int) {
+    fun onSaveButtonClick(planId: Int?) {
         (_state.value as? AddTaskForPlanState.DataLoaded)?.let {
             if (it.title.isNotBlank()) {
                 val task = Task(
@@ -45,7 +46,7 @@ class AddTaskForPlanViewModel @Inject constructor(
                     description = it.description.trim(),
                     isCompleted = it.isActive,
                     priority = it.priority,
-                    planId = planId
+                    planId = planId ?: Plan.UNDEFINED_ID
                 )
                 viewModelScope.launch {
                     Log.d("DEBUG", "Task planId = ${task.planId}")

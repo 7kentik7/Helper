@@ -7,7 +7,7 @@ data class Task @Inject constructor(
     val id: Int = UNDEFINED_ID,
     val title: String = "",
     val description: String? = null,
-    val isCompleted: Boolean = true,
+    val isCompleted: Boolean = false,
     val priority: TaskPriority = TaskPriority.MEDIUM,
     val planId: Int? = null
 ) {

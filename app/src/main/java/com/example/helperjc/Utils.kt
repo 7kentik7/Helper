@@ -22,6 +22,7 @@ fun AddTaskState.toDomain(): Task =
         description = this.description,
         isCompleted = this.isCompleted,
         priority = this.priority,
+        planId = this.planId?.toIntOrNull()
     )
 
 fun Color.muted(amount: Float = 0.35f): Color {
@@ -33,6 +34,7 @@ fun Color.muted(amount: Float = 0.35f): Color {
         alpha = 1f
     )
 }
+
 fun Color.toHex(): String {
     val r = (red * 255).toInt()
     val g = (green * 255).toInt()
@@ -40,6 +42,7 @@ fun Color.toHex(): String {
     val a = (alpha * 255).toInt()
     return String.format("#%02X%02X%02X%02X", a, r, g, b)
 }
+
 fun String.toColor(): Color {
     return Color(this.toColorInt())
 }

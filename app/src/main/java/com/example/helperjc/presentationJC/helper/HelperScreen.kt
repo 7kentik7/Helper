@@ -72,7 +72,8 @@ fun HelperScreen(
     onNotesClick: () -> Unit,
     onPlanItemClick: (Int) -> Unit,
     onAddPlanClick: () -> Unit,
-    onAddTaskForPlanClick: (Int) -> Unit
+    onAddTaskForPlanClick: (Int) -> Unit,
+    onPlanItemLongClick: (Int) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(
@@ -134,7 +135,8 @@ fun HelperScreen(
                         PlanItem(
                             planDetails = planDetails,
                             onPlanItemClick = onPlanItemClick,
-                            onAddTaskForPlanClick = onAddTaskForPlanClick
+                            onAddTaskForPlanClick = onAddTaskForPlanClick,
+                            onPlanItemLongClick = onPlanItemLongClick
                         )
                     }
                 }
@@ -202,6 +204,7 @@ private fun AppBar(
 private fun PlanItem(
     innerPadding: PaddingValues = PaddingValues(),
     planDetails: PlanDetails,
+    onPlanItemLongClick: (Int) -> Unit,
     onPlanItemClick: (Int) -> Unit,
     onAddTaskForPlanClick: (Int) -> Unit
 ) {
@@ -210,8 +213,8 @@ private fun PlanItem(
             .fillMaxWidth()
             .padding(innerPadding)
             .combinedClickable(
-                onLongClick = { onPlanItemClick(planDetails.plan.id) },
-                onClick = {}
+                onLongClick = { onPlanItemLongClick(planDetails.plan.id) },
+                onClick = { onPlanItemClick(planDetails.plan.id) }
             ),
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, color = planDetails.plan.color),
@@ -229,39 +232,39 @@ private fun PlanItem(
             }
             Text(text = planDetails.plan.title, fontSize = 18.sp)
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    ProgressBarForItemHelper(planDetails.progress)
-                    Text(
-                        text = stringResource(
-                            id = R.string.tasks_count,
-                            planDetails.countOfTasks
-                        ),
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    Text(
-                        text = stringResource(
-                            id = R.string.completed_tasks_count,
-                            planDetails.countOfCompletedTasks
-                        ),
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
-
-                IconButton(onClick = { onAddTaskForPlanClick(planDetails.plan.id) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.add_task),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
+            Column {
+                ProgressBarForItemHelper(planDetails.progress)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(
+                                id = R.string.tasks_count,
+                                planDetails.countOfTasks
+                            ),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Text(
+                            text = stringResource(
+                                id = R.string.completed_tasks_count,
+                                planDetails.countOfCompletedTasks
+                            ),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                    IconButton(onClick = { onAddTaskForPlanClick(planDetails.plan.id) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.add_task),
+                            contentDescription = null,
+                            tint = planDetails.plan.color,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
         }
