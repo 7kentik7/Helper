@@ -20,7 +20,8 @@ class TaskMapper @Inject constructor() {
         title = model.title,
         description = model.description,
         isCompleted = model.isActive,
-        priority = TaskPriority.valueOf(model.priority)
+        priority = TaskPriority.valueOf(model.priority),
+        planId = model.planId
     )
 
     fun mapListModelToListEntity(modelsList: List<TaskDbModel>): List<Task> {

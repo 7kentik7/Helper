@@ -7,8 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.plans.usecases.AddEditPlanUseCase
 import com.example.helperjc.domain.plans.usecases.GetPlanUseCase
+import com.example.helperjc.enums.PlanRepeatType
 import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.longToStringFormattedDate
+import com.example.helperjc.notifications.NotificationScheduler
+import com.example.helperjc.parseToLocalDateTime
 import com.example.helperjc.parseToString
 import com.example.helperjc.presentationJC.addEditTask.AddTaskState
 import com.example.helperjc.toDomain
@@ -25,13 +28,15 @@ data class AddPlanState(
     val planId: String? = null,
     val title: String = "",
     val endTime: String? = null,
-    val color: Color = Color.Gray
+    val color: Color = Color.Gray,
+    val repeatType: PlanRepeatType = PlanRepeatType.NONE
 )
 
 @HiltViewModel
 class AddPlanViewModel @Inject constructor(
     val addEditPlanUseCase: AddEditPlanUseCase,
     val getPlanUseCase: GetPlanUseCase,
+    val notificationScheduler: NotificationScheduler,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val planId: String? = savedStateHandle["planId"]
@@ -57,16 +62,32 @@ class AddPlanViewModel @Inject constructor(
     }
 
     fun onSavePlanClick(): Boolean {
-        if (_state.value.title.isBlank()) {
-            return false
-        } else {
-            viewModelScope.launch {
-                addEditPlanUseCase(_state.value.toDomain())
+        if (_state.value.title.isBlank()) return false
+        viewModelScope.launch {
+            val plan = _state.value.toDomain()
+            addEditPlanUseCase(plan)
+            val endTime = _state.value.endTime?.parseToLocalDateTime()
+            val repeatType = _state.value.repeatType
+            if (endTime != null && repeatType != PlanRepeatType.NONE) {
+                notificationScheduler.schedule(
+                    planId = plan.id,
+                    title = plan.title,
+                    endTime = endTime,
+                    repeatType = repeatType
+                )
             }
-            return true
+//            notificationScheduler.scheduleTest(
+//                planId = plan.id,
+//                title = plan.title,
+//                repeatType = _state.value.repeatType
+//            )
         }
+        return true
     }
 
+    fun onRepeatTypeChange(repeatType: PlanRepeatType) {
+        _state.update { it.copy(repeatType = repeatType) }
+    }
 
     fun onTitleChange(title: String) {
         _state.update { it.copy(title = title) }

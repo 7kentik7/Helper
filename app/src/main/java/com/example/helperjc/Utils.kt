@@ -12,7 +12,8 @@ fun AddPlanState.toDomain(): Plan =
         id = this.planId?.toInt() ?: Plan.UNDEFINED_ID,
         title = this.title.trim(),
         color = this.color,
-        endTime = this.endTime?.parseToLocalDateTime()
+        endTime = this.endTime?.parseToLocalDateTime(),
+        repeatAt = this.repeatType
     )
 
 fun AddTaskState.toDomain(): Task =
