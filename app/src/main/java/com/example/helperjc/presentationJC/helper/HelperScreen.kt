@@ -44,7 +44,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,13 +54,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
 import com.example.helperjc.domain.plandetails.PlanDetails
-import com.example.helperjc.parseToString
 import com.example.helperjc.presentationJC.theme.DeleteColor
 import com.example.helperjc.presentationJC.theme.ProgressFifthStep
 import com.example.helperjc.presentationJC.theme.ProgressFirstStep
 import com.example.helperjc.presentationJC.theme.ProgressFourthStep
 import com.example.helperjc.presentationJC.theme.ProgressSecondStep
 import com.example.helperjc.presentationJC.theme.ProgressThirdStep
+import com.example.helperjc.utils.parseToString
 
 
 @Composable

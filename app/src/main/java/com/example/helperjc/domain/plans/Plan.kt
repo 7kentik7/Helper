@@ -2,9 +2,7 @@ package com.example.helperjc.domain.plans
 
 import androidx.compose.ui.graphics.Color
 import com.example.helperjc.enums.PlanRepeatType
-import com.example.helperjc.toHex
 import java.time.LocalDateTime
-import javax.inject.Inject
 
 data class Plan(
     val id: Int = UNDEFINED_ID,

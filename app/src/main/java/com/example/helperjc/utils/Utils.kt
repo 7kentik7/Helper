@@ -1,11 +1,12 @@
-package com.example.helperjc
+package com.example.helperjc.utils
 
 import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.presentationJC.addEditPlan.AddPlanState
 import com.example.helperjc.presentationJC.addEditTask.AddTaskState
-import androidx.core.graphics.toColorInt
+import java.time.LocalDateTime
 
 fun AddPlanState.toDomain(): Plan =
     Plan(
@@ -13,7 +14,8 @@ fun AddPlanState.toDomain(): Plan =
         title = this.title.trim(),
         color = this.color,
         endTime = this.endTime?.parseToLocalDateTime(),
-        repeatAt = this.repeatType
+        repeatAt = this.repeatType,
+        startTime = this.startTime ?: LocalDateTime.now()
     )
 
 fun AddTaskState.toDomain(): Task =

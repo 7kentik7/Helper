@@ -1,15 +1,11 @@
 package com.example.helperjc.presentationJC.addEditPlan
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,13 +26,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,8 +51,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
-import com.example.helperjc.domain.plandetails.PlanDetails
-import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.enums.PlanRepeatType
 import io.mhssn.colorpicker.ColorPickerDialog
 import io.mhssn.colorpicker.ColorPickerType
@@ -80,7 +71,8 @@ fun AddEditPlanScreen(
             AppBar(
                 onSavePlanClick = { if (viewModel.onSavePlanClick()) onSaveButtonClick() },
                 onArrowBackClick = onArrowBackClick,
-                onColorPeekerClick = { showColorPicker = true }
+                onColorPeekerClick = { showColorPicker = true },
+                planColor = state.color
             )
         }) { paddingValues ->
         Column(
@@ -148,6 +140,7 @@ fun AddEditPlanScreen(
         }
     }
 }
+
 @Composable
 private fun RepeatTypePicker(
     selected: PlanRepeatType,
@@ -155,16 +148,17 @@ private fun RepeatTypePicker(
     enabled: Boolean
 ) {
     val options = listOf(
-        PlanRepeatType.NONE    to "Без напоминаний",
-        PlanRepeatType.DAILY   to "Каждый день",
-        PlanRepeatType.WEAKLY  to "Каждую неделю",
+        PlanRepeatType.NONE to "Без напоминаний",
+        PlanRepeatType.DAILY to "Каждый день",
+        PlanRepeatType.WEAKLY to "Каждую неделю",
         PlanRepeatType.MONTHLY to "Каждый месяц",
-        PlanRepeatType.YEARLY  to "Каждый год"
+        PlanRepeatType.YEARLY to "Каждый год"
     )
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 4.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp)
     ) {
         Text(
             text = "Напоминать:",
@@ -200,12 +194,14 @@ private fun RepeatTypePicker(
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppBar(
     onSavePlanClick: () -> Unit,
     onArrowBackClick: () -> Unit,
-    onColorPeekerClick: () -> Unit
+    onColorPeekerClick: () -> Unit,
+    planColor: Color
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -213,9 +209,9 @@ private fun AppBar(
         ), actions = {
             IconButton(onClick = onColorPeekerClick) {
                 Icon(
-                    painter = painterResource(R.drawable.baseline_more_time_24),
+                    painter = painterResource(R.drawable.color_peeker_icon),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = planColor
                 )
             }
             IconButton(onClick = onSavePlanClick) {

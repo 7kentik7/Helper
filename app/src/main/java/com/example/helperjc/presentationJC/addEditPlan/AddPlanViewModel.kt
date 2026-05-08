@@ -4,18 +4,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.plans.usecases.AddEditPlanUseCase
 import com.example.helperjc.domain.plans.usecases.GetPlanUseCase
 import com.example.helperjc.enums.PlanRepeatType
-import com.example.helperjc.enums.TaskPriority
-import com.example.helperjc.longToStringFormattedDate
 import com.example.helperjc.notifications.NotificationScheduler
-import com.example.helperjc.parseToLocalDateTime
-import com.example.helperjc.parseToString
-import com.example.helperjc.presentationJC.addEditTask.AddTaskState
-import com.example.helperjc.toDomain
-import com.example.helperjc.toLocalDateTime
+import com.example.helperjc.utils.longToStringFormattedDate
+import com.example.helperjc.utils.parseToLocalDateTime
+import com.example.helperjc.utils.parseToString
+import com.example.helperjc.utils.toDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +25,8 @@ data class AddPlanState(
     val title: String = "",
     val endTime: String? = null,
     val color: Color = Color.Gray,
-    val repeatType: PlanRepeatType = PlanRepeatType.NONE
+    val repeatType: PlanRepeatType = PlanRepeatType.NONE,
+    val startTime: LocalDateTime? = LocalDateTime.now()
 )
 
 @HiltViewModel
@@ -55,7 +52,8 @@ class AddPlanViewModel @Inject constructor(
                     planId = planId,
                     title = plan?.title ?: "",
                     endTime = plan?.endTime?.parseToString(),
-                    color = plan?.color ?: Color.Gray
+                    color = plan?.color ?: Color.Gray,
+                    startTime = plan?.startTime
                 )
             } ?: AddPlanState()
         }

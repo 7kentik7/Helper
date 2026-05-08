@@ -1,13 +1,12 @@
 package com.example.helperjc.data.mappers
 
-import androidx.compose.ui.graphics.Color
 import com.example.helperjc.data.database.models.PlanDbModel
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.enums.PlanRepeatType
-import com.example.helperjc.toColor
-import com.example.helperjc.toHex
-import com.example.helperjc.toLocalDateTime
-import com.example.helperjc.toTimeInMillis
+import com.example.helperjc.utils.toColor
+import com.example.helperjc.utils.toHex
+import com.example.helperjc.utils.toLocalDateTime
+import com.example.helperjc.utils.toTimeInMillis
 import javax.inject.Inject
 
 class PlanMapper @Inject constructor() {

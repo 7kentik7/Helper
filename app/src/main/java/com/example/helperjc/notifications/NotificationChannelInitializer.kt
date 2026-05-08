@@ -12,7 +12,6 @@ object NotificationChannelInitializer {
             "Планы",
             NotificationManager.IMPORTANCE_HIGH
         ).apply { description = "Напоминания о планах" }
-
         context.getSystemService(NotificationManager::class.java)
             .createNotificationChannel(channel)
     }

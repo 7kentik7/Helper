@@ -1,6 +1,5 @@
 package com.example.helperjc.presentationJC.plandetails
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -49,11 +48,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.enums.TaskPriority
-import com.example.helperjc.muted
 import com.example.helperjc.presentationJC.theme.DeleteColor
 import com.example.helperjc.presentationJC.theme.PriorityHigh
 import com.example.helperjc.presentationJC.theme.PriorityLow
 import com.example.helperjc.presentationJC.theme.PriorityMedium
+import com.example.helperjc.utils.muted
 
 @Composable
 fun PlanDetailsScreen(
