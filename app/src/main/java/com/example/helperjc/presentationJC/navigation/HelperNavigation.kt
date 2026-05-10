@@ -40,6 +40,7 @@ sealed class Screen(val route: String) {
             }
         }
     }
+    data object AiGenerate : Screen("aiGenerated")
 
     data object TasksList : Screen("tasksList")
 }
@@ -73,5 +74,9 @@ class HelperNavigationActions(
             launchSingleTop = true
         }
     }
-
+    fun navigateToAiGenerate() {
+        navController.navigate(Screen.AiGenerate.route) {
+            launchSingleTop = true
+        }
+    }
 }

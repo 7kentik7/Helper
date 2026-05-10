@@ -1,11 +1,12 @@
-package com.example.helperjc.data.database
+package com.example.helperjc.data.local.database
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import com.example.helperjc.data.database.models.PlanDbModel
-import com.example.helperjc.data.database.models.PlanDetailsModel
+import com.example.helperjc.data.local.database.models.PlanDbModel
+import com.example.helperjc.data.local.database.models.PlanDetailsModel
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,4 +27,7 @@ interface PlanDao {
     @Transaction
     @Query("SELECT * FROM plans")
     fun getFlowListPlanWithTasks(): Flow<List<PlanDetailsModel>>
+
+    @Insert
+    suspend fun addAiPlan(plan: PlanDbModel): Long
 }

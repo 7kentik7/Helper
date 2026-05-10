@@ -1,6 +1,6 @@
-package com.example.helperjc.data.mappers
+package com.example.helperjc.data.local.mappers
 
-import com.example.helperjc.data.database.models.PlanDetailsModel
+import com.example.helperjc.data.local.database.models.PlanDetailsModel
 import com.example.helperjc.domain.plandetails.PlanDetails
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.enums.TaskPriority

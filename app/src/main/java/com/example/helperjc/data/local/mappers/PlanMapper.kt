@@ -1,6 +1,6 @@
-package com.example.helperjc.data.mappers
+package com.example.helperjc.data.local.mappers
 
-import com.example.helperjc.data.database.models.PlanDbModel
+import com.example.helperjc.data.local.database.models.PlanDbModel
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.enums.PlanRepeatType
 import com.example.helperjc.utils.toColor

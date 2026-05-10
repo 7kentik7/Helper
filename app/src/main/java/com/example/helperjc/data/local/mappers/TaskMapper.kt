@@ -1,6 +1,6 @@
-package com.example.helperjc.data.mappers
+package com.example.helperjc.data.local.mappers
 
-import com.example.helperjc.data.database.models.TaskDbModel
+import com.example.helperjc.data.local.database.models.TaskDbModel
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.enums.TaskPriority
 import javax.inject.Inject

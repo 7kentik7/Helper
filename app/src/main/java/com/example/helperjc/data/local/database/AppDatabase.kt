@@ -1,11 +1,11 @@
-package com.example.helperjc.data.database
+package com.example.helperjc.data.local.database
 
 import android.app.Application
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.helperjc.data.database.models.PlanDbModel
-import com.example.helperjc.data.database.models.TaskDbModel
+import com.example.helperjc.data.local.database.models.PlanDbModel
+import com.example.helperjc.data.local.database.models.TaskDbModel
 
 @Database(entities = [TaskDbModel::class, PlanDbModel::class], version = 13, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {

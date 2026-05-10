@@ -1,7 +1,7 @@
-package com.example.helperjc.data.repositoriesimpl
+package com.example.helperjc.data.local.repositoriesimpl
 
-import com.example.helperjc.data.database.TaskDao
-import com.example.helperjc.data.mappers.TaskMapper
+import com.example.helperjc.data.local.database.TaskDao
+import com.example.helperjc.data.local.mappers.TaskMapper
 import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.domain.tasks.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow

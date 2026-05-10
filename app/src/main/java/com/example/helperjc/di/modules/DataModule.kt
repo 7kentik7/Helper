@@ -2,9 +2,11 @@ package com.example.helperjc.di.modules
 
 import android.app.Application
 import android.content.Context
-import com.example.helperjc.data.database.AppDatabase
-import com.example.helperjc.data.database.PlanDao
-import com.example.helperjc.data.database.TaskDao
+import com.example.helperjc.data.local.database.AppDatabase
+import com.example.helperjc.data.local.database.PlanDao
+import com.example.helperjc.data.local.database.TaskDao
+import com.example.helperjc.data.network.GeminiApiFactory
+import com.example.helperjc.data.network.GeminiApiService
 import com.example.helperjc.notifications.NotificationScheduler
 import dagger.Module
 import dagger.Provides
@@ -32,4 +34,7 @@ object DataModule {
     fun provideNotificationScheduler(@ApplicationContext context: Context): NotificationScheduler =
         NotificationScheduler(context)
 
+    @Singleton
+    @Provides
+    fun provideGeminiApiService(): GeminiApiService = GeminiApiFactory.geminiApiService
 }

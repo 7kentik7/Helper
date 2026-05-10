@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.helperjc.presentationJC.aiGenerated.AiGenerateScreen
 import com.example.helperjc.presentationJC.addEditPlan.AddEditPlanScreen
 import com.example.helperjc.presentationJC.addEditTask.AddEditTaskDialog
 import com.example.helperjc.presentationJC.helper.HelperScreen
@@ -36,7 +37,7 @@ fun HelperNavGraph(
                 onPlanItemClick = { id -> navActions.navigateToPlanDetailsScreen(planId = id) },
                 onAddPlanClick = { navActions.navigateToAddEditPlan() },
                 onTasksClick = { navActions.navigateToTasksScreen() },
-                onNotesClick = {},
+                onNotesClick = {navActions.navigateToAiGenerate()},
                 onAddTaskForPlanClick = { id -> navActions.navigateToAddEditTask(planId = id) },
                 onPlanItemLongClick = { id -> navActions.navigateToAddEditPlan(id) }
             )
@@ -107,6 +108,13 @@ fun HelperNavGraph(
                         planId = planId
                     )
                 }
+            )
+        }
+        composable(Screen.AiGenerate.route) {
+            AiGenerateScreen(
+                modifier = Modifier.fillMaxSize(),
+                onBackClick = { navActions.navigateUp() },
+                onSuccess = { navActions.navigateUp() }
             )
         }
     }

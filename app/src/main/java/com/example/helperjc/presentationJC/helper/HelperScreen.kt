@@ -79,7 +79,7 @@ fun HelperScreen(
         topBar = {
             AppBar(
                 onTasksClick = onTasksClick,
-                onNotesClick = onTasksClick
+                onNotesClick = onNotesClick
             )
         },
         containerColor = MaterialTheme.colorScheme.background,

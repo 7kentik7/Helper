@@ -1,4 +1,4 @@
-package com.example.helperjc.data.database.models
+package com.example.helperjc.data.local.database.models
 
 import androidx.room.Embedded
 import androidx.room.Relation

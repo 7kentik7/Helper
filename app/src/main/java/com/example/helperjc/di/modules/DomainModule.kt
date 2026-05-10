@@ -1,8 +1,8 @@
 package com.example.helperjc.di.modules
 
-import com.example.helperjc.data.repositoriesimpl.PlanDetailsRepositoryImpl
-import com.example.helperjc.data.repositoriesimpl.PlanRepositoryImpl
-import com.example.helperjc.data.repositoriesimpl.TaskRepositoryImpl
+import com.example.helperjc.data.local.repositoriesimpl.PlanDetailsRepositoryImpl
+import com.example.helperjc.data.local.repositoriesimpl.PlanRepositoryImpl
+import com.example.helperjc.data.local.repositoriesimpl.TaskRepositoryImpl
 import com.example.helperjc.domain.plandetails.repository.PlanDetailsRepository
 import com.example.helperjc.domain.plans.repository.PlanRepository
 import com.example.helperjc.domain.tasks.repository.TaskRepository

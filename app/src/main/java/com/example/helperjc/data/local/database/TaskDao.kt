@@ -1,9 +1,9 @@
-package com.example.helperjc.data.database
+package com.example.helperjc.data.local.database
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.helperjc.data.database.models.TaskDbModel
+import com.example.helperjc.data.local.database.models.TaskDbModel
 import kotlinx.coroutines.flow.Flow
 
 @Dao
