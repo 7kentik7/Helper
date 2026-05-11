@@ -1,4 +1,4 @@
-package com.example.helperjc.data.local.mappers
+package com.example.helperjc.data.mappers
 
 import com.example.helperjc.data.local.database.models.PlanDetailsModel
 import com.example.helperjc.domain.plandetails.PlanDetails

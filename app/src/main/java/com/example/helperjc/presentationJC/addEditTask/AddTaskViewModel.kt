@@ -9,7 +9,9 @@ import com.example.helperjc.domain.tasks.usecases.GetTaskUseCase
 import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.utils.toDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,7 +23,8 @@ data class AddTaskState(
     val description: String = "",
     val isCompleted: Boolean = false,
     val priority: TaskPriority = TaskPriority.MEDIUM,
-    val planId: String? = null
+    val planId: String? = null,
+    val showTitleError: Boolean = false
 )
 
 @HiltViewModel
@@ -32,6 +35,8 @@ class AddTaskViewModel @Inject constructor(
 ) : ViewModel() {
     private val taskId: String? = savedStateHandle["taskId"]
     private val planId: String? = savedStateHandle["planId"]
+    private val _errorEvent = MutableSharedFlow<String>()
+    val errorEvent = _errorEvent.asSharedFlow()
     private val _state = MutableStateFlow(AddTaskState())
     val state = _state.asStateFlow()
 
@@ -57,15 +62,17 @@ class AddTaskViewModel @Inject constructor(
 
     fun onSaveButtonClick(): Boolean {
         if (_state.value.title.isBlank()) {
-            val oldState = _state.value
-            _state.value = oldState
-            return false
-        } else {
+            _state.update { it.copy(showTitleError = true) }
             viewModelScope.launch {
-                addEditTaskUseCase(_state.value.toDomain())
+                _errorEvent.emit("Название не может быть пустым")
             }
-            return true
+            return false
         }
+        _state.update { it.copy(showTitleError = false) }
+        viewModelScope.launch {
+            addEditTaskUseCase(_state.value.toDomain())
+        }
+        return true
     }
 
     fun onTitleChange(title: String) {

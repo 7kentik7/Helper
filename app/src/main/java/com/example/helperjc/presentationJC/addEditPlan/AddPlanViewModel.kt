@@ -13,7 +13,9 @@ import com.example.helperjc.utils.parseToLocalDateTime
 import com.example.helperjc.utils.parseToString
 import com.example.helperjc.utils.toDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,7 +28,8 @@ data class AddPlanState(
     val endTime: String? = null,
     val color: Color = Color.Gray,
     val repeatType: PlanRepeatType = PlanRepeatType.NONE,
-    val startTime: LocalDateTime? = LocalDateTime.now()
+    val startTime: LocalDateTime? = LocalDateTime.now(),
+    val showTitleError: Boolean = false
 )
 
 @HiltViewModel
@@ -37,6 +40,8 @@ class AddPlanViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val planId: String? = savedStateHandle["planId"]
+    private val _errorEvent = MutableSharedFlow<String>()
+    val errorEvent = _errorEvent.asSharedFlow()
     private val _state = MutableStateFlow(AddPlanState())
     val state = _state.asStateFlow()
 
@@ -60,7 +65,13 @@ class AddPlanViewModel @Inject constructor(
     }
 
     fun onSavePlanClick(): Boolean {
-        if (_state.value.title.isBlank()) return false
+        if (_state.value.title.isBlank()) {
+            _state.update { it.copy(showTitleError = true) }
+            viewModelScope.launch {
+                _errorEvent.emit("Название не может быть пустым")
+            }
+            return false
+        }
         viewModelScope.launch {
             val plan = _state.value.toDomain()
             addEditPlanUseCase(plan)

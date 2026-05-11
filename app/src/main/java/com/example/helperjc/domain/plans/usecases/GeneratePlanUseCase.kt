@@ -1,118 +1,105 @@
 package com.example.helperjc.domain.plans.usecases
-
-import androidx.compose.ui.graphics.Color
 import com.example.helperjc.BuildConfig
 import com.example.helperjc.data.local.database.PlanDao
 import com.example.helperjc.data.local.database.TaskDao
-import com.example.helperjc.data.local.database.models.PlanDbModel
-import com.example.helperjc.data.local.database.models.TaskDbModel
+import com.example.helperjc.data.mappers.PlanDtoMapper
 import com.example.helperjc.data.network.AiApiService
 import com.example.helperjc.data.network.AiRequest
+import com.example.helperjc.data.network.AiResponse
+import com.example.helperjc.data.network.AsyncResult
 import com.example.helperjc.data.network.PlanDto
-import com.example.helperjc.enums.PlanRepeatType
-import com.example.helperjc.enums.TaskPriority
-import com.example.helperjc.utils.toHex
-import com.example.helperjc.utils.toTimeInMillis
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
-import java.time.LocalDateTime
+import com.example.helperjc.data.network.mappers.AiResponseMapper
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
-
 class GeneratePlanUseCase @Inject constructor(
     private val aiApiService: AiApiService,
     private val planDao: PlanDao,
     private val taskDao: TaskDao,
+    private val aiResponseMapper: AiResponseMapper,
+    private val planDtoMapper: PlanDtoMapper
 ) {
-    private val systemPrompt = """
-    Ты помощник по планированию. Пользователь описывает свою цель.
-    Создай план с конкретными задачами. Количество задач определяй сам исходя из цели.
-    Отвечай ТОЛЬКО валидным JSON без пояснений и markdown-блоков:
-    {
-      "title": "Название плана",
-      "tasks": [
-        {"title": "...", "description": null, "priority": "HIGH"},
-        {"title": "...", "description": null, "priority": "MEDIUM"}
-      ]
+
+    suspend operator fun invoke(userGoal: String): AsyncResult<Unit> {
+        return try {
+            val response = sendRequestToAi(userGoal)
+
+            val responseText = extractTextFromResponse(response)
+                ?: return AsyncResult.Error("Пустой ответ от AI")
+
+            val jsonText = aiResponseMapper.extractJson(responseText)
+                ?: return AsyncResult.Error("Не удалось найти JSON в ответе")
+
+            val aiError = aiResponseMapper.parseErrorOrNull(jsonText)
+            if (aiError != null) return AsyncResult.Error(aiError)
+
+            val planDto = aiResponseMapper.parsePlan(jsonText)
+                ?: return AsyncResult.Error("Не удалось разобрать план из ответа AI")
+
+            savePlanToDatabase(planDto)
+
+            AsyncResult.Success(Unit)
+
+        } catch (e: HttpException) {
+            AsyncResult.Error(mapHttpError(e.code()))
+        } catch (e: IOException) {
+            AsyncResult.Error("Нет подключения к интернету")
+        } catch (e: Exception) {
+            AsyncResult.Error(e.message ?: "Неизвестная ошибка")
+        }
     }
-    Требования к задачам:
-    - title: короткое название, максимум 4-5 слов
-    - description: всегда null
-    - priority: только LOW, MEDIUM, HIGH
-""".trimIndent()
 
-    suspend operator fun invoke(userGoal: String): Result<Unit> = runCatching {
-
-        val response = aiApiService.generateContent(
+    private suspend fun sendRequestToAi(userGoal: String): AiResponse {
+        return aiApiService.generateContent(
             token = "Bearer ${BuildConfig.GEMINI_API_KEY}",
             request = AiRequest(
-                model = "gemini-2.5-flash-preview-04-17",
                 messages = listOf(
-                    AiRequest.Message(role = "system", content = systemPrompt),
+                    AiRequest.Message(role = "system", content = SYSTEM_PROMPT),
                     AiRequest.Message(role = "user", content = userGoal)
                 )
             )
         )
-
-        val content = response.choices
-            .firstOrNull()?.message?.content
-            ?: throw IllegalStateException("Пустой ответ от API")
-
-        val jsonText = content.extractJson()
-
-        val dto = try {
-            Gson().fromJson(jsonText, PlanDto::class.java)
-        } catch (e: JsonSyntaxException) {
-            throw IllegalStateException("Не удалось разобрать ответ от ИИ: ${e.message}")
-        }
-
-        if (dto.title.isBlank()) {
-            throw IllegalStateException("ИИ вернул план без названия")
-        }
-
-        val planId = planDao.addAiPlan(
-            PlanDbModel(
-                id = 0,
-                title = dto.title,
-                color = Color.Gray.toHex(),
-                repeatAt = PlanRepeatType.NONE.name,
-                startTime = LocalDateTime.now().toTimeInMillis(),
-                endTime = null
-            )
-        )
-
-        dto.tasks.forEach { task ->
-            val priority = try {
-                TaskPriority.valueOf(task.priority.uppercase())
-            } catch (e: IllegalArgumentException) {
-                TaskPriority.MEDIUM
-            }
-
-            taskDao.addEditTask(
-                TaskDbModel(
-                    id = 0,
-                    title = task.title,
-                    description = task.description,
-                    isActive = false,
-                    priority = priority.name,
-                    planId = planId.toInt()
-                )
-            )
-        }
     }
 
-    private fun String.extractJson(): String {
-        val cleaned = this
-            .replace(Regex("```json\\s*"), "")
-            .replace(Regex("```\\s*"), "")
-            .trim()
+    private fun extractTextFromResponse(response: AiResponse): String? {
+        return response.choices.firstOrNull()?.message?.content
+    }
 
-        val start = cleaned.indexOf('{')
-        val end = cleaned.lastIndexOf('}')
+    private suspend fun savePlanToDatabase(planDto: PlanDto) {
+        val planDbModel = planDtoMapper.toPlanDbModel(planDto)
+        val planId = planDao.addAiPlan(planDbModel)
 
-        if (start == -1 || end == -1 || start >= end) {
-            throw IllegalStateException("JSON не найден в ответе API")
-        }
+        val taskDbModels = planDtoMapper.toTaskDbModels(planDto.tasks, planId.toInt())
+        taskDbModels.forEach { task -> taskDao.addEditTask(task) }
+    }
 
-        return cleaned.substring(start, end + 1)
+    private fun mapHttpError(code: Int): String = when (code) {
+        400 -> "Неверный запрос к API"
+        401 -> "Неверный API ключ"
+        403 -> "Доступ запрещён"
+        429 -> "Превышен лимит запросов, попробуйте позже"
+        500, 502, 503 -> "Сервер недоступен, попробуйте позже"
+        else -> "Ошибка сети: $code"
+    }
+
+    companion object {
+        private val SYSTEM_PROMPT = """
+            Ты помощник по планированию. Пользователь описывает свою цель.
+            Если запрос НЕ связан с планированием, целями или задачами — верни ТОЛЬКО это:
+            {"error": "Опишите цель или задачу, которую хотите достичь"}
+            
+            Если запрос связан с планированием — верни ТОЛЬКО валидный JSON:
+            {
+              "title": "Название плана",
+              "tasks": [
+                {"title": "...", "description": null, "priority": "HIGH"},
+                {"title": "...", "description": null, "priority": "MEDIUM"}
+              ]
+            }
+            Требования к задачам:
+            - title: короткое название, максимум 4-5 слов
+            - description: всегда null
+            - priority: только LOW, MEDIUM, HIGH
+        """.trimIndent()
     }
 }

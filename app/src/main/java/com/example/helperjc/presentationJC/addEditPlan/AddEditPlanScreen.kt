@@ -25,12 +25,15 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,7 +58,6 @@ import com.example.helperjc.enums.PlanRepeatType
 import io.mhssn.colorpicker.ColorPickerDialog
 import io.mhssn.colorpicker.ColorPickerType
 
-
 @Composable
 fun AddEditPlanScreen(
     modifier: Modifier = Modifier,
@@ -66,15 +68,26 @@ fun AddEditPlanScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var showDatePicker by remember { mutableStateOf(false) }
     var showColorPicker by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.errorEvent.collect { message ->
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
     Scaffold(
-        modifier = modifier, topBar = {
-            AppBar(
+        modifier = modifier,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        topBar = {
+            AddEditPlanAppBar(
                 onSavePlanClick = { if (viewModel.onSavePlanClick()) onSaveButtonClick() },
                 onArrowBackClick = onArrowBackClick,
                 onColorPeekerClick = { showColorPicker = true },
                 planColor = state.color
             )
-        }) { paddingValues ->
+        }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -85,6 +98,15 @@ fun AddEditPlanScreen(
                 onValueChange = viewModel::onTitleChange,
                 label = { Text(stringResource(R.string.name)) },
                 singleLine = true,
+                isError = state.title.isBlank() && state.showTitleError,
+                supportingText = {
+                    if (state.title.isBlank() && state.showTitleError) {
+                        Text(
+                            text = stringResource(R.string.title_cannot_be_empty),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(PaddingValues(start = 4.dp, end = 4.dp))
@@ -100,7 +122,6 @@ fun AddEditPlanScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Default.DateRange, contentDescription = null)
-
                     Spacer(Modifier.width(12.dp))
                     Text(
                         text = state.endTime ?: "Выбрать дату",
@@ -111,22 +132,24 @@ fun AddEditPlanScreen(
             RepeatTypePicker(
                 selected = state.repeatType,
                 onSelected = viewModel::onRepeatTypeChange,
-                enabled = state.endTime != null // активно только если выбрана дата
+                enabled = state.endTime != null
             )
-
             AnimatedVisibility(visible = state.endTime != null) {
-                InputChip(selected = false, onClick = {}, label = {
-                    Text(state.endTime ?: "")
-                }, trailingIcon = {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = null,
-                        modifier = Modifier.clickable {
-                            viewModel.onEndTimeDelete()
-                        })
-                })
+                InputChip(
+                    selected = false,
+                    onClick = {},
+                    label = { Text(state.endTime ?: "") },
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { viewModel.onEndTimeDelete() }
+                        )
+                    }
+                )
             }
         }
+
         ColorPeeker(
             showColorDialog = showColorPicker,
             onPlanColorChange = viewModel::onColorChanged,
@@ -134,9 +157,10 @@ fun AddEditPlanScreen(
         )
 
         if (showDatePicker) {
-            PlanDatePicker(onDateSelected = { millis ->
-                viewModel.onEndTimeChange(millis)
-            }, onDismiss = { showDatePicker = !showDatePicker })
+            PlanDatePicker(
+                onDateSelected = { millis -> viewModel.onEndTimeChange(millis) },
+                onDismiss = { showDatePicker = !showDatePicker }
+            )
         }
     }
 }
@@ -197,7 +221,7 @@ private fun RepeatTypePicker(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AppBar(
+private fun AddEditPlanAppBar(
     onSavePlanClick: () -> Unit,
     onArrowBackClick: () -> Unit,
     onColorPeekerClick: () -> Unit,
@@ -206,7 +230,8 @@ private fun AppBar(
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
-        ), actions = {
+        ),
+        actions = {
             IconButton(onClick = onColorPeekerClick) {
                 Icon(
                     painter = painterResource(R.drawable.color_peeker_icon),
@@ -221,7 +246,8 @@ private fun AppBar(
                     contentDescription = null
                 )
             }
-        }, title = {
+        },
+        title = {
             Text(
                 modifier = Modifier.padding(4.dp),
                 text = stringResource(R.string.add_plan),
@@ -229,14 +255,16 @@ private fun AppBar(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-        }, navigationIcon = {
-            IconButton(onClick = { onArrowBackClick() }) {
+        },
+        navigationIcon = {
+            IconButton(onClick = onArrowBackClick) {
                 Icon(
                     ImageVector.vectorResource(R.drawable.outline_arrow_back_24),
                     contentDescription = null
                 )
             }
-        })
+        }
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -275,21 +303,18 @@ fun PlanDatePicker(
         initialSelectedDateMillis = System.currentTimeMillis()
     )
 
-    DatePickerDialog(onDismissRequest = onDismiss, confirmButton = {
-        TextButton(
-            onClick = {
-                datePickerState.selectedDateMillis?.let {
-                    onDateSelected(it)
-                }
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                datePickerState.selectedDateMillis?.let { onDateSelected(it) }
                 onDismiss()
-            }) {
-            Text("OK")
+            }) { Text("OK") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Отмена") }
         }
-    }, dismissButton = {
-        TextButton(onClick = onDismiss) {
-            Text("Отмена")
-        }
-    }) {
+    ) {
         DatePicker(state = datePickerState)
     }
 }
