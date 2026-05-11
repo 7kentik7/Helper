@@ -10,8 +10,9 @@ import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.utils.toHex
 import com.example.helperjc.utils.toTimeInMillis
 import java.time.LocalDateTime
+import javax.inject.Inject
 
-class PlanDtoMapper {
+class PlanDtoMapper @Inject constructor() {
     fun toPlanDbModel(planDto: PlanDto): PlanDbModel {
         return PlanDbModel(
             id = 0,

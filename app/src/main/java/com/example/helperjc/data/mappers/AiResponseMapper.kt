@@ -1,4 +1,4 @@
-package com.example.helperjc.data.network.mappers
+package com.example.helperjc.data.mappers
 
 import com.example.helperjc.data.network.PlanDto
 import com.google.gson.Gson

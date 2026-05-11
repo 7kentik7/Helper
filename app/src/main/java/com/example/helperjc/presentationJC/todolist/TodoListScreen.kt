@@ -106,6 +106,9 @@ fun TaskListScreen(
                                 viewModel.deleteTask(task)
                                 true
                             } else false
+                        },
+                        positionalThreshold = { totalDistance ->
+                            totalDistance * 0.4f
                         }
                     )
                     SwipeToDismissBox(

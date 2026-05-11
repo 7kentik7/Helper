@@ -8,7 +8,7 @@ import com.example.helperjc.data.network.AiRequest
 import com.example.helperjc.data.network.AiResponse
 import com.example.helperjc.data.network.AsyncResult
 import com.example.helperjc.data.network.PlanDto
-import com.example.helperjc.data.network.mappers.AiResponseMapper
+import com.example.helperjc.data.mappers.AiResponseMapper
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
