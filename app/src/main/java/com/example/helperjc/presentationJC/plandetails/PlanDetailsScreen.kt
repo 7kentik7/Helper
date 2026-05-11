@@ -105,7 +105,11 @@ fun PlanDetailsScreen(
                                 viewModel.deleteTask(task)
                                 true
                             } else false
+                        },
+                        positionalThreshold = { totalDistance ->
+                            totalDistance * 0.7f
                         }
+
                     )
                     SwipeToDismissBox(
                         modifier = Modifier.animateItem(),

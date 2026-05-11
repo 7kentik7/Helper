@@ -1,7 +1,7 @@
 package com.example.helperjc.data.local.repositoriesimpl
 
 import com.example.helperjc.data.local.database.PlanDao
-import com.example.helperjc.data.local.mappers.PlanMapper
+import com.example.helperjc.data.mappers.PlanMapper
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.plans.repository.PlanRepository
 import javax.inject.Inject

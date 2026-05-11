@@ -37,7 +37,7 @@ fun HelperNavGraph(
                 onPlanItemClick = { id -> navActions.navigateToPlanDetailsScreen(planId = id) },
                 onAddPlanClick = { navActions.navigateToAddEditPlan() },
                 onTasksClick = { navActions.navigateToTasksScreen() },
-                onNotesClick = {navActions.navigateToAiGenerate()},
+                onAiPlanClick = {navActions.navigateToAiGenerate()},
                 onAddTaskForPlanClick = { id -> navActions.navigateToAddEditTask(planId = id) },
                 onPlanItemLongClick = { id -> navActions.navigateToAddEditPlan(id) }
             )

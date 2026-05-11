@@ -68,7 +68,7 @@ fun HelperScreen(
     modifier: Modifier = Modifier,
     viewModel: HelperViewModel = hiltViewModel(),
     onTasksClick: () -> Unit,
-    onNotesClick: () -> Unit,
+    onAiPlanClick: () -> Unit,
     onPlanItemClick: (Int) -> Unit,
     onAddPlanClick: () -> Unit,
     onAddTaskForPlanClick: (Int) -> Unit,
@@ -79,7 +79,7 @@ fun HelperScreen(
         topBar = {
             AppBar(
                 onTasksClick = onTasksClick,
-                onNotesClick = onNotesClick
+                onAiPlanClick = onAiPlanClick
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -121,6 +121,9 @@ fun HelperScreen(
                                 viewModel.deletePlan(planDetails)
                                 true
                             } else false
+                        },
+                        positionalThreshold = { totalDistance ->
+                            totalDistance * 0.7f
                         }
                     )
 
@@ -166,18 +169,19 @@ private fun DeleteBackground() {
 @Composable
 private fun AppBar(
     onTasksClick: () -> Unit,
-    onNotesClick: () -> Unit,
+    onAiPlanClick: () -> Unit,
 ) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
         ),
         actions = {
-            IconButton(onClick = onNotesClick) {
+            IconButton(onClick = onAiPlanClick) {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    imageVector = ImageVector.vectorResource(R.drawable.notes_icon),
-                    contentDescription = null
+                    imageVector = ImageVector.vectorResource(R.drawable.ai_plan_icon),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
             IconButton(onClick = onTasksClick) {

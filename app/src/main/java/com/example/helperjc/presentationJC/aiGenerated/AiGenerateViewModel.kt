@@ -1,8 +1,8 @@
 package com.example.helperjc.presentationJC.aiGenerated
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.helperjc.data.network.AsyncResult
 import com.example.helperjc.domain.plans.usecases.GeneratePlanUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,15 +35,24 @@ class AiGenerateViewModel @Inject constructor(
             _state.update { it.copy(error = "Опишите вашу цель") }
             return
         }
+
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            generatePlanUseCase(_state.value.goal)
-                .onSuccess {
+
+            when (val result = generatePlanUseCase(_state.value.goal)) {
+                is AsyncResult.Success -> {
                     _state.update { it.copy(isLoading = false, isSuccess = true) }
                 }
-                .onFailure { error ->
-                    _state.update { it.copy(isLoading = false, error = error.message) }
+
+                is AsyncResult.Error -> {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = result.errorMessage
+                        )
+                    }
                 }
+            }
         }
     }
 }

@@ -17,10 +17,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.helperjc.R
-import com.example.helperjc.domain.tasks.Task
 import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.presentationJC.theme.PriorityHigh
 import com.example.helperjc.presentationJC.theme.PriorityLow
@@ -49,7 +50,17 @@ fun AddEditTaskDialog(
     onSaveButtonClick: () -> Unit
 ) {
     val state by viewmodel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewmodel.errorEvent.collect { message ->
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
     ModalBottomSheet(onDismissRequest = onDismissClick) {
+        SnackbarHost(hostState = snackbarHostState)
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,11 +71,21 @@ fun AddEditTaskDialog(
             )
         ) {
             val descriptionState = remember { mutableStateOf(false) }
+
             TextField(
                 value = state.title,
                 onValueChange = viewmodel::onTitleChange,
                 label = { Text(stringResource(R.string.name)) },
                 singleLine = true,
+                isError = state.title.isBlank() && state.showTitleError,
+                supportingText = {
+                    if (state.title.isBlank() && state.showTitleError) {
+                        Text(
+                            text = stringResource(R.string.title_cannot_be_empty),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(PaddingValues(start = 4.dp, end = 4.dp)),
@@ -81,6 +102,7 @@ fun AddEditTaskDialog(
                         .padding(PaddingValues(start = 4.dp, end = 4.dp)),
                 )
             }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -92,7 +114,7 @@ fun AddEditTaskDialog(
                 ) {
                     IconButton(onClick = {
                         if (!descriptionState.value) {
-                            descriptionState.value = !descriptionState.value
+                            descriptionState.value = true
                         }
                     }) {
                         Icon(
@@ -114,12 +136,10 @@ fun AddEditTaskDialog(
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
-
             }
         }
     }
 }
-
 
 @Composable
 private fun RadioButtonsPriority(
@@ -131,17 +151,14 @@ private fun RadioButtonsPriority(
         TaskPriority.MEDIUM,
         TaskPriority.HIGH
     )
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         radioOptions.forEach { priority ->
             Row(
-                modifier = Modifier
-                    .selectable(
-                        selected = (priority == selected),
-                        onClick = { onSelected(priority) },
-                        role = Role.RadioButton
-                    ),
+                modifier = Modifier.selectable(
+                    selected = (priority == selected),
+                    onClick = { onSelected(priority) },
+                    role = Role.RadioButton
+                ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val color = when (priority) {
@@ -149,7 +166,6 @@ private fun RadioButtonsPriority(
                     TaskPriority.MEDIUM -> PriorityMedium
                     TaskPriority.HIGH -> PriorityHigh
                 }
-
                 RadioButton(
                     selected = priority == selected,
                     onClick = null,

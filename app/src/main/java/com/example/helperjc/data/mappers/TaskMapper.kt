@@ -1,4 +1,4 @@
-package com.example.helperjc.data.local.mappers
+package com.example.helperjc.data.mappers
 
 import com.example.helperjc.data.local.database.models.TaskDbModel
 import com.example.helperjc.domain.tasks.Task
