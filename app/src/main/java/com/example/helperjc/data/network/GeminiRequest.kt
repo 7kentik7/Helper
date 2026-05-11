@@ -1,6 +1,5 @@
 package com.example.helperjc.data.network
 
-
 data class GeminiRequest(
     val contents: List<Content>,
     val systemInstruction: SystemInstruction? = null,
@@ -20,6 +19,6 @@ data class GeminiRequest(
     )
 
     data class GenerationConfig(
-        val responseMimeType: String = "application/json"
+        val temperature: Double = 0.7
     )
 }
