@@ -3,7 +3,7 @@ package com.example.helperjc.presentationJC.aiGenerated
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.helperjc.domain.ai.usecases.GeneratePlanUseCase
+import com.example.helperjc.domain.plans.usecases.GeneratePlanUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
