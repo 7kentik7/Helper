@@ -6,8 +6,9 @@ import com.example.helperjc.data.local.database.AppDatabase
 
 import com.example.helperjc.data.local.database.PlanDao
 import com.example.helperjc.data.local.database.TaskDao
-import com.example.helperjc.data.network.GeminiApiFactory
-import com.example.helperjc.data.network.GeminiApiService
+import com.example.helperjc.data.network.AiApiFactory
+import com.example.helperjc.data.network.AiApiService
+
 import com.example.helperjc.notifications.NotificationScheduler
 import dagger.Module
 import dagger.Provides
@@ -37,5 +38,5 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun provideGeminiApiService(): GeminiApiService = GeminiApiFactory.geminiApiService
+    fun provideGeminiApiService(): AiApiService = AiApiFactory.apiService
 }

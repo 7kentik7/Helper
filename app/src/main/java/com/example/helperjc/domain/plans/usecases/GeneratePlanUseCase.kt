@@ -1,14 +1,16 @@
 package com.example.helperjc.domain.plans.usecases
 
 import androidx.compose.ui.graphics.Color
+import com.example.helperjc.BuildConfig
 import com.example.helperjc.data.local.database.PlanDao
 import com.example.helperjc.data.local.database.TaskDao
 import com.example.helperjc.data.local.database.models.PlanDbModel
 import com.example.helperjc.data.local.database.models.TaskDbModel
-import com.example.helperjc.data.network.GeminiApiService
-import com.example.helperjc.data.network.GeminiRequest
+import com.example.helperjc.data.network.AiApiService
+import com.example.helperjc.data.network.AiRequest
 import com.example.helperjc.data.network.PlanDto
 import com.example.helperjc.enums.PlanRepeatType
+import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.utils.toHex
 import com.example.helperjc.utils.toTimeInMillis
 import com.google.gson.Gson
@@ -17,25 +19,45 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 
 class GeneratePlanUseCase @Inject constructor(
-    private val geminiApiService: GeminiApiService,
+    private val aiApiService: AiApiService,
     private val planDao: PlanDao,
     private val taskDao: TaskDao,
 ) {
+    private val systemPrompt = """
+    Ты помощник по планированию. Пользователь описывает свою цель.
+    Создай план с конкретными задачами. Количество задач определяй сам исходя из цели.
+    Отвечай ТОЛЬКО валидным JSON без пояснений и markdown-блоков:
+    {
+      "title": "Название плана",
+      "tasks": [
+        {"title": "...", "description": null, "priority": "HIGH"},
+        {"title": "...", "description": null, "priority": "MEDIUM"}
+      ]
+    }
+    Требования к задачам:
+    - title: короткое название, максимум 4-5 слов
+    - description: всегда null
+    - priority: только LOW, MEDIUM, HIGH
+""".trimIndent()
+
     suspend operator fun invoke(userGoal: String): Result<Unit> = runCatching {
-        val response = geminiApiService.generateContent(
-            request = buildRequest(userGoal)
+
+        val response = aiApiService.generateContent(
+            token = "Bearer ${BuildConfig.GEMINI_API_KEY}",
+            request = AiRequest(
+                model = "gemini-2.5-flash-preview-04-17",
+                messages = listOf(
+                    AiRequest.Message(role = "system", content = systemPrompt),
+                    AiRequest.Message(role = "user", content = userGoal)
+                )
+            )
         )
 
-        // Gemini 2.0+ может вернуть несколько parts (thinking + ответ).
-        // Берём все текстовые parts и ищем тот, который содержит JSON.
-        val parts = response.candidates.firstOrNull()?.content?.parts
+        val content = response.choices
+            .firstOrNull()?.message?.content
             ?: throw IllegalStateException("Пустой ответ от API")
 
-        val jsonText = parts
-            .mapNotNull { it.text }
-            .firstOrNull { it.contains("{") }
-            ?.extractJson()
-            ?: throw IllegalStateException("JSON не найден в ответе API")
+        val jsonText = content.extractJson()
 
         val dto = try {
             Gson().fromJson(jsonText, PlanDto::class.java)
@@ -59,12 +81,10 @@ class GeneratePlanUseCase @Inject constructor(
         )
 
         dto.tasks.forEach { task ->
-            val safePriority = try {
-                // Проверяем что priority валидный, иначе ставим MEDIUM
-                com.example.helperjc.enums.TaskPriority.valueOf(task.priority.uppercase())
-                task.priority.uppercase()
+            val priority = try {
+                TaskPriority.valueOf(task.priority.uppercase())
             } catch (e: IllegalArgumentException) {
-                "MEDIUM"
+                TaskPriority.MEDIUM
             }
 
             taskDao.addEditTask(
@@ -73,7 +93,7 @@ class GeneratePlanUseCase @Inject constructor(
                     title = task.title,
                     description = task.description,
                     isActive = false,
-                    priority = safePriority,
+                    priority = priority.name,
                     planId = planId.toInt()
                 )
             )
@@ -81,47 +101,18 @@ class GeneratePlanUseCase @Inject constructor(
     }
 
     private fun String.extractJson(): String {
-        // Убираем markdown code block если есть
-        val withoutMarkdown = this
+        val cleaned = this
             .replace(Regex("```json\\s*"), "")
             .replace(Regex("```\\s*"), "")
             .trim()
 
-        // Ищем первую { и последнюю } — берём только JSON-объект
-        val start = withoutMarkdown.indexOf('{')
-        val end = withoutMarkdown.lastIndexOf('}')
+        val start = cleaned.indexOf('{')
+        val end = cleaned.lastIndexOf('}')
 
         if (start == -1 || end == -1 || start >= end) {
-            throw IllegalStateException("Не найден корректный JSON-объект в ответе")
+            throw IllegalStateException("JSON не найден в ответе API")
         }
 
-        return withoutMarkdown.substring(start, end + 1)
-    }
-
-    private fun buildRequest(userGoal: String): GeminiRequest {
-        val systemPrompt = """
-            Ты помощник по планированию. Пользователь описывает свою цель.
-            Создай план с конкретными задачами. Количество задач определяй сам исходя из цели.
-            Отвечай ТОЛЬКО валидным JSON без пояснений и markdown-блоков:
-            {
-              "title": "Название плана",
-              "tasks": [
-                {"title": "...", "description": "...", "priority": "HIGH"},
-                {"title": "...", "description": null, "priority": "MEDIUM"}
-              ]
-            }
-            Для priority используй только: LOW, MEDIUM, HIGH
-        """.trimIndent()
-
-        return GeminiRequest(
-            systemInstruction = GeminiRequest.SystemInstruction(
-                parts = listOf(GeminiRequest.Part(systemPrompt))
-            ),
-            contents = listOf(
-                GeminiRequest.Content(
-                    parts = listOf(GeminiRequest.Part(userGoal))
-                )
-            )
-        )
+        return cleaned.substring(start, end + 1)
     }
 }
