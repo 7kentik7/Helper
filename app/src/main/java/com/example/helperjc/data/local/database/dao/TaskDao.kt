@@ -1,4 +1,4 @@
-package com.example.helperjc.data.local.database
+package com.example.helperjc.data.local.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
