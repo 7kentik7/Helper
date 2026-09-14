@@ -4,7 +4,6 @@ import com.example.helperjc.domain.habbits.Habit
 
 interface HabitRepository {
     suspend fun getHabit(habitId: Int): Habit?
-    suspend fun makeDayComplete(habit: Habit)
     suspend fun addEditHabit(habit: Habit)
     suspend fun deleteHabit(habitId: Int)
 

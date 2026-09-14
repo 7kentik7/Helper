@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.Context
 import com.example.helperjc.data.local.database.AppDatabase
 
-import com.example.helperjc.data.local.database.PlanDao
-import com.example.helperjc.data.local.database.TaskDao
+import com.example.helperjc.data.local.database.dao.PlanDao
+import com.example.helperjc.data.local.database.dao.TaskDao
 import com.example.helperjc.data.network.AiApiFactory
 import com.example.helperjc.data.network.AiApiService
 

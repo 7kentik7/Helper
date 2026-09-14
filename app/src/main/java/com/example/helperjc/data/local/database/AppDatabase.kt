@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.helperjc.data.local.database.dao.PlanDao
+import com.example.helperjc.data.local.database.dao.TaskDao
 import com.example.helperjc.data.local.database.models.PlanDbModel
 import com.example.helperjc.data.local.database.models.TaskDbModel
 

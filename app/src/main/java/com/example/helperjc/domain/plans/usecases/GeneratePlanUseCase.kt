@@ -1,7 +1,7 @@
 package com.example.helperjc.domain.plans.usecases
 import com.example.helperjc.BuildConfig
-import com.example.helperjc.data.local.database.PlanDao
-import com.example.helperjc.data.local.database.TaskDao
+import com.example.helperjc.data.local.database.dao.PlanDao
+import com.example.helperjc.data.local.database.dao.TaskDao
 import com.example.helperjc.data.mappers.PlanDtoMapper
 import com.example.helperjc.data.network.AiApiService
 import com.example.helperjc.data.network.AiRequest
