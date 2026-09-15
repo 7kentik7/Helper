@@ -1,7 +1,7 @@
 package com.example.helperjc.data.local.repositoriesimpl
 
 import com.example.helperjc.data.local.database.dao.PlanDao
-import com.example.helperjc.data.mappers.PlanDetailsMapper
+import com.example.helperjc.data.mappers.plans.PlanDetailsMapper
 import com.example.helperjc.domain.plandetails.PlanDetails
 import com.example.helperjc.domain.plandetails.repository.PlanDetailsRepository
 import kotlinx.coroutines.flow.Flow

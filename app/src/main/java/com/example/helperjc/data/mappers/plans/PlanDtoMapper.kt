@@ -1,4 +1,4 @@
-package com.example.helperjc.data.mappers
+package com.example.helperjc.data.mappers.plans
 
 import androidx.compose.ui.graphics.Color
 import com.example.helperjc.data.local.database.models.PlanDbModel

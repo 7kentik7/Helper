@@ -3,6 +3,7 @@ package com.example.helperjc.utils
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -11,7 +12,10 @@ import java.util.Locale
 fun LocalDateTime.toTimeInMillis(): Long = atZone(ZoneId.systemDefault())
     .toInstant()
     .toEpochMilli()
+fun YearMonth.toEpochMonth(): Long = year * 12L + (monthValue - 1)
 
+fun Long.toYearMonth(): YearMonth =
+    YearMonth.of((this / 12).toInt(), (this % 12).toInt() + 1)
 fun Long.toLocalDateTime(): LocalDateTime = Instant.ofEpochMilli(this)
     .atZone(ZoneId.systemDefault())
     .toLocalDateTime()

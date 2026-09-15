@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 
 @Entity(
-    tableName = "habits",
+    tableName = "habitDays",
     primaryKeys = ["habitId", "day", "period"],
     foreignKeys = [
         ForeignKey(
