@@ -6,5 +6,4 @@ interface HabitRepository {
     suspend fun getHabit(habitId: Int): Habit?
     suspend fun addEditHabit(habit: Habit)
     suspend fun deleteHabit(habitId: Int)
-
 }

@@ -2,16 +2,17 @@ package com.example.helperjc.domain.plans.usecases
 import com.example.helperjc.BuildConfig
 import com.example.helperjc.data.local.database.dao.PlanDao
 import com.example.helperjc.data.local.database.dao.TaskDao
-import com.example.helperjc.data.mappers.PlanDtoMapper
+import com.example.helperjc.data.mappers.AiResponseMapper
+import com.example.helperjc.data.mappers.plans.PlanDtoMapper
 import com.example.helperjc.data.network.AiApiService
 import com.example.helperjc.data.network.AiRequest
 import com.example.helperjc.data.network.AiResponse
 import com.example.helperjc.data.network.AsyncResult
 import com.example.helperjc.data.network.PlanDto
-import com.example.helperjc.data.mappers.AiResponseMapper
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+
 class GeneratePlanUseCase @Inject constructor(
     private val aiApiService: AiApiService,
     private val planDao: PlanDao,
