@@ -6,13 +6,12 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import com.example.helperjc.data.local.database.models.HabitDbModel
 import com.example.helperjc.data.local.database.models.HabitWithDaysModel
-import com.example.helperjc.domain.habbits.Habit
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HabitDao {
     @Upsert
-    suspend fun addEditHabit(habit: Habit)
+    suspend fun addEditHabit(habitDbModel: HabitDbModel)
 
     @Query("DELETE FROM habits WHERE id = :habitId")
     suspend fun deleteHabit(habitId: Int)
