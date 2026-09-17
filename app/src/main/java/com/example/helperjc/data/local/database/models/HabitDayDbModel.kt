@@ -19,6 +19,7 @@ data class HabitDayDbModel(
     val id: Int,
     val day: Int,
     val period: Long,
-    val isCompleted: Boolean
-) {
-}
+    val isCompleted: Boolean,
+    val countOfRepetitions: Int,
+    val countOfCompletedRepetitions: Int
+)

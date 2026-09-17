@@ -2,16 +2,11 @@ package com.example.helperjc.utils
 
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
-import com.example.helperjc.data.local.database.models.PlanDbModel
-import com.example.helperjc.data.local.database.models.TaskDbModel
-import com.example.helperjc.data.network.PlanDto
-import com.example.helperjc.data.network.TaskDto
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.tasks.Task
-import com.example.helperjc.enums.PlanRepeatType
-import com.example.helperjc.enums.TaskPriority
 import com.example.helperjc.presentationJC.addEditPlan.AddPlanState
 import com.example.helperjc.presentationJC.addEditTask.AddTaskState
+import java.time.DayOfWeek
 import java.time.LocalDateTime
 
 fun AddPlanState.toDomain(): Plan =
@@ -54,4 +49,11 @@ fun Color.toHex(): String {
 
 fun String.toColor(): Color {
     return Color(this.toColorInt())
+}
+
+fun DayOfWeek.localeAndMapToString(languageTag: String): String {
+    return getDisplayName(
+        java.time.format.TextStyle.SHORT,
+        java.util.Locale(languageTag)
+    ).replaceFirstChar { it.titlecase() }
 }

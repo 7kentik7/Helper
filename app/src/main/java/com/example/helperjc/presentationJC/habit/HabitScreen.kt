@@ -1,6 +1,14 @@
 package com.example.helperjc.presentationJC.habit
 
-import android.widget.ProgressBar
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,50 +16,39 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.helperjc.R
 import com.example.helperjc.domain.habbits.HabitDay
-import com.example.helperjc.presentationJC.theme.ProgressFifthStep
-import com.example.helperjc.presentationJC.theme.ProgressFirstStep
-import com.example.helperjc.presentationJC.theme.ProgressFourthStep
-import com.example.helperjc.presentationJC.theme.ProgressSecondStep
-import com.example.helperjc.presentationJC.theme.ProgressThirdStep
+import com.example.helperjc.utils.localeAndMapToString
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -88,74 +85,84 @@ private fun Habit() {
             )
         }
 
-        HabitWeek()
+        HabitWeek(modifier = Modifier)
     }
 }
 
 
 @Composable
-private fun HabitWeek() {
-    val month = YearMonth.now()
-    val daysInMonth = month.lengthOfMonth()
+private fun HabitWeek(
+    modifier: Modifier
+) {
+    val today = LocalDate.now().dayOfWeek
+    val daysOfWeek = DayOfWeek.entries
+    Row(
+        modifier = Modifier
 
-    val weeksCount = (daysInMonth + 6) / 7
+            .padding(6.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
 
-    val today = LocalDate.now()
-
-    val initialPage = (today.dayOfMonth - 1) / 7
-
-    val pagerState = rememberPagerState(
-        initialPage = initialPage,
-        pageCount = { weeksCount }
-    )
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxWidth()
-    ) { page ->
-
-        val startDay = page * 7 + 1
-        val endDay = minOf(
-            startDay + 6,
-            daysInMonth
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(6.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-
+        daysOfWeek.forEach { day ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-
-            for (day in startDay..endDay) {
-
-                val date = month.atDay(day)
-
-                HabitDay()
+                Text(
+                    text = day.localeAndMapToString("ru")
+                )
+                HabitWeekDay(
+                    modifier = modifier,
+                    isToday = day == today,
+                    habitDays = habitWeekTestList()
+                )
             }
+
         }
     }
 }
 
 
 @Composable
-private fun HabitDay(
+private fun HabitWeekDay(
+    modifier: Modifier,
+    isToday: Boolean,
+    habitDays: List<HabitDay>
 ) {
     Box(
         modifier = Modifier
-            .size(width = 32.dp, height = 18.dp).clip(RoundedCornerShape(40.dp))
-//            .border(
-//                color = MaterialTheme.colorScheme.outline,
-//                width = 1.dp,
-//                shape = RoundedCornerShape(12.dp)
-//            )
-
-            .padding(1.dp)
-            .background(color = MaterialTheme.colorScheme.background),
+            .size(width = 32.dp, height = 18.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .background(color = MaterialTheme.colorScheme.background)
+            .then(
+                if (isToday) {
+                    Modifier.border(
+                        color = MaterialTheme.colorScheme.outline,
+                        width = 1.dp,
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                } else modifier
+            )
+            .padding(2.dp),
         contentAlignment = Alignment.Center
     ) {
-        ProgressBarForItemHabitDay(23)
+        habitDays.forEach {
+            if (it.countOfRepetitions > 1 && !it.isCompleted) {
+                LinearProgressBarHabit(
+                    progress = calculateProgress(
+                        it.countOfCompletedRepetitions,
+                        it.countOfRepetitions
+                    )
+                )
+            }
+        }
     }
+}
+
+private fun calculateProgress(completed: Int, total: Int): Int {
+    if (total <= 0) return 0
+    return (completed * 100) / total
 }
 
 @Composable
@@ -185,16 +192,12 @@ private fun StausIcon(
 
 
         }
-
-
-//            Icon(
-//                imageVector = Icons.Default.Check,
-//                contentDescription = "Выполнено",
-//                modifier = Modifier.size(36.dp),
-//                tint = MaterialTheme.colorScheme.primary
-//            )
-
-
+        Icon(
+            imageVector = Icons.Default.Check,
+            contentDescription = "Выполнено",
+            modifier = Modifier.size(36.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
     }
 }
 
@@ -217,6 +220,88 @@ fun ProgressBarForItemHabitDay(progress: Int) {
                 .background(color)
         )
     }
+}
+
+@Composable
+fun LinearProgressBarHabit(
+    progress: Int,
+    modifier: Modifier = Modifier,
+    height: Dp = 6.dp,
+    color: Color = Color.Cyan,
+    trackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+) {
+    val target = (progress / 100f).coerceIn(0f, 1f)
+
+    val animatedProgress by animateFloatAsState(
+        targetValue = target,
+        animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
+        label = "linearProgress",
+    )
+
+    // Цвет плавно переходит в зелёный на 100%
+    val animatedColor by animateColorAsState(
+        targetValue = if (target >= 1f) Color(0xFF4CAF50) else color,
+        animationSpec = tween(400),
+        label = "linearColor",
+    )
+
+    // Пульсация непрозрачности, когда есть прогресс и он < 100%
+    val pulse = rememberInfiniteTransition(label = "pulse")
+    val alpha by pulse.animateFloat(
+        initialValue = 1f,
+        targetValue = if (target in 0.01f..0.99f) 0.75f else 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(900, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "alpha",
+    )
+
+    // Появление шкалы (fade + scale)
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    val appear by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(300),
+        label = "appear",
+    )
+
+
+    val shape = RoundedCornerShape(percent = 50)
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height)
+            .alpha(appear)
+            .clip(shape)
+            .background(trackColor),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(animatedProgress)
+                .fillMaxHeight()
+                .clip(shape)
+                .background(animatedColor.copy(alpha = alpha))
+        )
+    }
+}
+
+private fun habitWeekTestList(): List<HabitDay> {
+    val days = mutableListOf<HabitDay>()
+    for (i in 1..7) {
+        days.add(
+            HabitDay(
+                id = i,
+                day = i,
+                period = YearMonth.now(),
+                isCompleted = i % 2 == 0,
+                countOfRepetitions = i,
+                countOfCompletedRepetitions = i
+            )
+        )
+    }
+    return days
 }
 
 
