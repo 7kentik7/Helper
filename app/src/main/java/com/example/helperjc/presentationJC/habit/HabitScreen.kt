@@ -72,19 +72,18 @@ private fun Habit() {
         )
     ) {
         Row(
-            modifier = Modifier,
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
             StausIcon(2)
             Text(
                 modifier = Modifier.padding(4.dp),
                 maxLines = 1,
-                text = "Зарядка",
+                text = "Зарядкa",
                 overflow = TextOverflow.Ellipsis
             )
         }
-
         HabitWeek(modifier = Modifier)
     }
 }
@@ -98,9 +97,9 @@ private fun HabitWeek(
     val daysOfWeek = DayOfWeek.entries
     Row(
         modifier = Modifier
-
-            .padding(6.dp),
-        horizontalArrangement = Arrangement.Start,
+            .padding(6.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
