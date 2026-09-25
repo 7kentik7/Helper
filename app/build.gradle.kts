@@ -22,16 +22,19 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val geminiBaseUrl = project.findProperty("GEMINI_BASE_URL")?.toString() ?: ""
+        val geminiApiKey = project.findProperty("GEMINI_API_KEY")?.toString() ?: ""
+
         buildConfigField(
             "String",
             "GEMINI_BASE_URL",
-            "\"${property("GEMINI_BASE_URL")}\""
+            "\"$geminiBaseUrl\""
         )
 
         buildConfigField(
             "String",
             "GEMINI_API_KEY",
-            "\"${property("GEMINI_API_KEY")}\""
+            "\"$geminiApiKey\""
         )
     }
 
