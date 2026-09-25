@@ -8,5 +8,6 @@ data class HabitDay(
     val period: YearMonth,
     val isCompleted: Boolean,
     val countOfRepetitions: Int,
-    val countOfCompletedRepetitions: Int
+    val countOfCompletedRepetitions: Int,
+    val progress: Int
 )
