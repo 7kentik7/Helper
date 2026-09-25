@@ -11,14 +11,18 @@ class HabitDayMapper @Inject constructor() {
         id = entity.id,
         day = entity.day,
         period = entity.period.toEpochMonth(),
-        isCompleted = entity.isCompleted
+        isCompleted = entity.isCompleted,
+        countOfRepetitions = entity.countOfRepetitions,
+        countOfCompletedRepetitions = entity.countOfCompletedRepetitions,
     )
 
     fun mapModelToEntity(model: HabitDayDbModel): HabitDay = HabitDay(
         id = model.id,
         day = model.day,
         period = model.period.toYearMonth(),
-        isCompleted = model.isCompleted
+        isCompleted = model.isCompleted,
+        countOfRepetitions = model.countOfRepetitions,
+        countOfCompletedRepetitions = model.countOfCompletedRepetitions
     )
 
     fun mapListModelToListEntity(modelList: List<HabitDayDbModel>): List<HabitDay> {
