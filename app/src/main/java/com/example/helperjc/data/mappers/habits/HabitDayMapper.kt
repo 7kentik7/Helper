@@ -14,6 +14,7 @@ class HabitDayMapper @Inject constructor() {
         isCompleted = entity.isCompleted,
         countOfRepetitions = entity.countOfRepetitions,
         countOfCompletedRepetitions = entity.countOfCompletedRepetitions,
+
     )
 
     fun mapModelToEntity(model: HabitDayDbModel): HabitDay = HabitDay(
@@ -22,12 +23,21 @@ class HabitDayMapper @Inject constructor() {
         period = model.period.toYearMonth(),
         isCompleted = model.isCompleted,
         countOfRepetitions = model.countOfRepetitions,
-        countOfCompletedRepetitions = model.countOfCompletedRepetitions
+        countOfCompletedRepetitions = model.countOfCompletedRepetitions,
+        progress = calculateProgress(
+            completed = model.countOfCompletedRepetitions,
+            total = model.countOfRepetitions
+        )
     )
 
     fun mapListModelToListEntity(modelList: List<HabitDayDbModel>): List<HabitDay> {
         return modelList.map {
             mapModelToEntity(it)
         }
+    }
+
+    private fun calculateProgress(completed: Int, total: Int): Int {
+        if (total <= 0) return 0
+        return (completed * 100) / total
     }
 }

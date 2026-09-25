@@ -10,12 +10,15 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,16 +44,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.helperjc.domain.habbits.HabitDay
+import com.example.helperjc.presentationJC.theme.HelperJCTheme
+import com.example.helperjc.utils.ThemePreviews
 import com.example.helperjc.utils.localeAndMapToString
+import com.example.helperjc.utils.muted
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import kotlin.math.min
 
 @Composable
 fun HabitScreen() {
@@ -61,7 +74,6 @@ fun HabitScreen() {
     }
 }
 
-@Preview
 @Composable
 private fun Habit() {
     Card(
@@ -72,18 +84,29 @@ private fun Habit() {
         )
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            StausIcon(2)
+            HabitProgress(
+                progress = 0.1f,
+                modifier = Modifier.size(48.dp)
+            )
+
             Text(
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
                 maxLines = 1,
-                text = "Зарядкa",
+                text = "ЗарядЗарядЗарядЗарядЗарядЗарядЗарядЗарядЗарядЗаряд",
                 overflow = TextOverflow.Ellipsis
             )
+
+            StausIcon(5)
         }
+
+
         HabitWeek(modifier = Modifier)
     }
 }
@@ -97,9 +120,8 @@ private fun HabitWeek(
     val daysOfWeek = DayOfWeek.entries
     Row(
         modifier = Modifier
-            .padding(6.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .padding(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -114,7 +136,7 @@ private fun HabitWeek(
                 HabitWeekDay(
                     modifier = modifier,
                     isToday = day == today,
-                    habitDays = habitWeekTestList()
+                    habitDay = habitWeekTestList()[day.value - 1]
                 )
             }
 
@@ -127,13 +149,13 @@ private fun HabitWeek(
 private fun HabitWeekDay(
     modifier: Modifier,
     isToday: Boolean,
-    habitDays: List<HabitDay>
+    habitDay: HabitDay
 ) {
     Box(
         modifier = Modifier
             .size(width = 32.dp, height = 18.dp)
             .clip(RoundedCornerShape(6.dp))
-            .background(color = MaterialTheme.colorScheme.background)
+            .background(color = MaterialTheme.colorScheme.primary)
             .then(
                 if (isToday) {
                     Modifier.border(
@@ -146,29 +168,21 @@ private fun HabitWeekDay(
             .padding(2.dp),
         contentAlignment = Alignment.Center
     ) {
-        habitDays.forEach {
-            if (it.countOfRepetitions > 1 && !it.isCompleted) {
-                LinearProgressBarHabit(
-                    progress = calculateProgress(
-                        it.countOfCompletedRepetitions,
-                        it.countOfRepetitions
-                    )
-                )
-            }
+
+        if (habitDay.countOfRepetitions > 1 && !habitDay.isCompleted) {
+            LinearProgressBarHabit(
+                progress = habitDay.progress
+            )
+
         }
     }
 }
 
-private fun calculateProgress(completed: Int, total: Int): Int {
-    if (total <= 0) return 0
-    return (completed * 100) / total
-}
 
 @Composable
 private fun StausIcon(
     streak: Int?
 ) {
-
     Box(
         modifier = Modifier
             .padding(4.dp)
@@ -184,13 +198,7 @@ private fun StausIcon(
         contentAlignment = Alignment.Center
     ) {
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
 
-
-        }
         Icon(
             imageVector = Icons.Default.Check,
             contentDescription = "Выполнено",
@@ -226,8 +234,8 @@ fun LinearProgressBarHabit(
     progress: Int,
     modifier: Modifier = Modifier,
     height: Dp = 6.dp,
-    color: Color = Color.Cyan,
-    trackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    color: Color = MaterialTheme.colorScheme.primary,
+    trackColor: Color = color.muted(0.6f),
 ) {
     val target = (progress / 100f).coerceIn(0f, 1f)
 
@@ -286,6 +294,49 @@ fun LinearProgressBarHabit(
     }
 }
 
+@Composable
+fun HabitProgress(
+    progress: Float,
+    modifier: Modifier = Modifier,
+) {
+    val progressValue = progress.coerceIn(0f, 1f)
+
+    Canvas(
+        modifier = modifier.aspectRatio(1f)
+    ) {
+        val strokeWidth = 2.dp.toPx()
+        // Радиус круга
+        val radius = (size.minDimension - strokeWidth) / 2f
+        // Сам заполненный круг
+        drawCircle(
+            color = Color.Cyan,
+            radius = radius,
+            center = center
+        )
+        // Фоновая обводка
+        drawArc(
+            color = Color.Cyan.muted(),
+            startAngle = -90f,
+            sweepAngle = 360f,
+            useCenter = false,
+            style = Stroke(
+                width = strokeWidth
+            )
+        )
+        // Прогресс
+        drawArc(
+            color = Color(0xFF10B981),
+            startAngle = -90f,
+            sweepAngle = 360f * progressValue,
+            useCenter = false,
+            style = Stroke(
+                width = strokeWidth,
+                cap = StrokeCap.Round
+            )
+        )
+    }
+}
+
 private fun habitWeekTestList(): List<HabitDay> {
     val days = mutableListOf<HabitDay>()
     for (i in 1..7) {
@@ -296,14 +347,21 @@ private fun habitWeekTestList(): List<HabitDay> {
                 period = YearMonth.now(),
                 isCompleted = i % 2 == 0,
                 countOfRepetitions = i,
-                countOfCompletedRepetitions = i
+                countOfCompletedRepetitions = i,
+                progress = i * 7
             )
         )
     }
     return days
 }
 
-
+@ThemePreviews
+@Composable
+private fun HabitPreview() {
+    HelperJCTheme() {
+        Habit()
+    }
+}
 
 
 
