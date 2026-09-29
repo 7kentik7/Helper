@@ -2,10 +2,11 @@ package com.example.helperjc.data.local.database.models
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import java.time.LocalDate
 
 @Entity(
-    tableName = "habitDays",
-    primaryKeys = ["habitId", "day", "period"],
+    tableName = "habit_days",
+    primaryKeys = ["habitId", "date"],
     foreignKeys = [
         ForeignKey(
             entity = HabitDbModel::class,
@@ -17,8 +18,8 @@ import androidx.room.ForeignKey
 )
 data class HabitDayDbModel(
     val id: Int,
-    val day: Int,
-    val period: Long,
+    val habitId: Int,
+    val date: Long,
     val isCompleted: Boolean,
     val countOfRepetitions: Int,
     val countOfCompletedRepetitions: Int

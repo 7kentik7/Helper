@@ -8,7 +8,7 @@ data class HabitWithDaysModel(
     val habit: HabitDbModel,
     @Relation(
         parentColumn = "id",
-        entityColumn = "id"
+        entityColumn = "habitId"
     )
     val habitDays: List<HabitDayDbModel>
 )

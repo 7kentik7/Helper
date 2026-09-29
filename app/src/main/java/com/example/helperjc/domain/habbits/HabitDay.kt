@@ -1,11 +1,12 @@
 package com.example.helperjc.domain.habbits
 
+import java.time.LocalDate
 import java.time.YearMonth
 
 data class HabitDay(
     val id: Int,
-    val day: Int,
-    val period: YearMonth,
+    val habitId: Int,
+    val date: LocalDate,
     val isCompleted: Boolean,
     val countOfRepetitions: Int,
     val countOfCompletedRepetitions: Int,
