@@ -21,7 +21,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -47,6 +51,7 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -71,6 +76,7 @@ import com.example.helperjc.utils.localeAndMapToString
 import com.example.helperjc.utils.toVisibleProgressColor
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.temporal.TemporalAdjusters
 
 @Composable
@@ -115,7 +121,7 @@ fun HabitScreen(
                         DeleteBackground()
                     }
                 ) {
-                    HabitWeekItem()
+                    HabitMonth()
                 }
             }
         }
@@ -245,6 +251,182 @@ private fun DeleteBackground() {
     }
 }
 
+@Composable
+private fun HabitMonth(
+    modifier: Modifier = Modifier,
+    days: List<HabitDay>,
+    habitColor: Color
+) {
+    val today = LocalDate.now()
+    val currentMonth = YearMonth.from(today)
+
+    val firstDayOfMonth = currentMonth.atDay(1)
+
+    // Понедельник = 0, вторник = 1 ... воскресенье = 6
+    val firstDayOffset =
+        firstDayOfMonth.dayOfWeek.value - DayOfWeek.MONDAY.value
+
+    val monthDates = remember(currentMonth) {
+        buildList<LocalDate?> {
+
+            // Пустые ячейки перед первым днём месяца
+            repeat(firstDayOffset) {
+                add(null)
+            }
+
+            // Дни текущего месяца
+            for (day in 1..currentMonth.lengthOfMonth()) {
+                add(currentMonth.atDay(day))
+            }
+
+            // Заполняем последнюю неделю до 7 ячеек
+            while (size % 7 != 0) {
+                add(null)
+            }
+        }
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(7),
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        userScrollEnabled = false
+    ) {
+        items(
+            count = monthDates.size,
+            key = { index -> index }
+        ) { index ->
+
+            val date = monthDates[index]
+
+            HabitMonthDay(
+                date = date,
+                habitDay = date?.let { currentDate ->
+                    days.firstOrNull {
+                        it.date == currentDate
+                    }
+                },
+                habitColor = habitColor
+            )
+        }
+    }
+}
+@Composable
+private fun HabitMonthDay(
+    date: LocalDate?,
+    habitDay: HabitDay?,
+    habitColor: Color
+) {
+    if (date == null) {
+        Spacer(
+            modifier = Modifier.size(32.dp)
+        )
+        return
+    }
+
+    val today = LocalDate.now()
+    val colors = rememberHabitColorScheme(habitColor)
+
+    val progress = habitDay?.progress ?: 0
+
+    val backgroundColor = when {
+        progress >= 100 -> {
+            colors.completed
+        }
+
+        progress > 0 -> {
+            colors.progress.copy(
+                alpha = 0.25f + (progress / 100f) * 0.5f
+            )
+        }
+
+        else -> {
+            colors.background
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .size(32.dp)
+            .clip(
+                RoundedCornerShape(7.dp)
+            )
+            .background(backgroundColor)
+            .then(
+                if (date == today) {
+                    Modifier.border(
+                        width = 2.dp,
+                        color = colors.progress,
+                        shape = RoundedCornerShape(7.dp)
+                    )
+                } else {
+                    Modifier
+                }
+            )
+    )
+}
+@Composable
+private fun HabitMonthHeader(
+    habitWithDays: HabitWithDays,
+    month: String,
+    streak: Int,
+    colors: HabitColorScheme,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        // Иконка
+        Box(
+            modifier = Modifier
+                .size(72.dp)
+                .background(
+                    color = colors.background,
+                    shape = CircleShape
+                )
+                .border(
+                    width = 5.dp,
+                    color = colors.track,
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "😍",
+                fontSize = 32.sp
+            )
+        }
+
+        Spacer(
+            modifier = Modifier.width(16.dp)
+        )
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = habitWithDays.habit.title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 20.sp,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Text(
+                text ="сент.2026",
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        StreakIcon(
+            streak = streak,
+            color = colors.background
+        )
+    }
+}
 @Composable
 private fun HabitWeekItem(
 ) {
@@ -650,6 +832,7 @@ private fun habitWeekTestList(): List<HabitDay> {
 private fun HabitPreview() {
     HelperJCTheme() {
         HabitScreen()
+
     }
 }
 
