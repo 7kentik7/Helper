@@ -121,7 +121,7 @@ fun HabitScreen(
                         DeleteBackground()
                     }
                 ) {
-                    HabitMonth()
+                    HabitWeekItem()
                 }
             }
         }
