@@ -10,7 +10,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -19,13 +21,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -38,6 +42,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,10 +66,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.helperjc.domain.habbits.Habit
 import com.example.helperjc.domain.habbits.HabitColorScheme
 import com.example.helperjc.domain.habbits.HabitDay
@@ -73,18 +83,20 @@ import com.example.helperjc.presentationJC.theme.DeleteColor
 import com.example.helperjc.presentationJC.theme.HelperJCTheme
 import com.example.helperjc.utils.ThemePreviews
 import com.example.helperjc.utils.localeAndMapToString
+import com.example.helperjc.utils.parseToString
 import com.example.helperjc.utils.toVisibleProgressColor
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.Year
 import java.time.YearMonth
 import java.time.temporal.TemporalAdjusters
 
 @Composable
 fun HabitScreen(
     modifier: Modifier = Modifier,
-
-    ) {
-//    val state by viewModel.state.collectAsStateWithLifecycle()
+    viewModel: HabitViewModel = hiltViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(topBar = {
         AppBar(
             selectedPeriod = HabitPeriod.MONTH,
@@ -94,40 +106,173 @@ fun HabitScreen(
         )
     }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(horizontal = 6.dp)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(4) { habitWithDays ->
-                val dismissState = rememberSwipeToDismissBoxState(
-                    confirmValueChange = { value ->
-                        if (value == SwipeToDismissBoxValue.EndToStart) {
-//                            viewModel.deletePlan(planDetails)
-                            true
-                        } else false
-                    },
-                    positionalThreshold = { totalDistance ->
-                        totalDistance * 0.7f
-                    }
+        when (state.period) {
+            HabitPeriod.WEEK -> {
+                HabitWeakLazyColumn(
+                    state = state,
+                    viewModel = viewModel,
+                    innerPadding = innerPadding
                 )
+            }
 
-                SwipeToDismissBox(
-                    modifier = Modifier.animateItem(),
-                    state = dismissState,
-                    backgroundContent = {
-                        DeleteBackground()
-                    }
-                ) {
-                    HabitWeekItem()
+            HabitPeriod.MONTH -> {
+                HabitMonthGrid(
+                    state = state,
+                    viewModel = viewModel,
+                    innerPadding = innerPadding
+                )
+            }
+
+            HabitPeriod.YEAR -> {
+                HabitYearLazyColumn(
+                    state = state,
+                    viewModel = viewModel,
+                    innerPadding = innerPadding
+                )
+            }
+        }
+
+    }
+}
+
+@Composable
+private fun HabitWeakLazyColumn(
+    state: HabitState,
+    viewModel: HabitViewModel,
+    innerPadding: PaddingValues
+) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(innerPadding)
+            .padding(horizontal = 6.dp)
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(items = state.habitList, key = { it.habit.id }) { habitWithDays ->
+            val dismissState = rememberSwipeToDismissBoxState(
+                confirmValueChange = { value ->
+                    if (value == SwipeToDismissBoxValue.EndToStart) {
+                        viewModel.deleteHabit(habitWithDays)
+                        true
+                    } else false
+                },
+                positionalThreshold = { totalDistance ->
+                    totalDistance * 0.7f
                 }
+            )
+
+            SwipeToDismissBox(
+                modifier = Modifier.animateItem(),
+                state = dismissState,
+                backgroundContent = {
+                    DeleteBackground()
+                }
+            ) {
+                HabitWeekItem(
+                    habitWithDays = habitWithDays,
+                    today = state.today
+                )
             }
         }
     }
 }
 
+@Composable
+private fun HabitMonthGrid(
+    state: HabitState,
+    viewModel: HabitViewModel,
+    innerPadding: PaddingValues
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier
+            .padding(innerPadding)
+            .padding(horizontal = 6.dp)
+            .fillMaxSize(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(
+            items = state.habitList,
+            key = { it.habit.id }
+        ) { habitWithDays ->
+
+            val dismissState = rememberSwipeToDismissBoxState(
+                confirmValueChange = { value ->
+                    if (value == SwipeToDismissBoxValue.EndToStart) {
+                        viewModel.deleteHabit(habitWithDays)
+                        true
+                    } else {
+                        false
+                    }
+                },
+                positionalThreshold = { totalDistance ->
+                    totalDistance * 0.7f
+                }
+            )
+
+            SwipeToDismissBox(
+                modifier = Modifier.animateItem(),
+                state = dismissState,
+                backgroundContent = {
+                    DeleteBackground()
+                }
+            ) {
+                HabitMonthItem(
+                    habitWithDays = habitWithDays,
+                    today = state.today
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HabitYearLazyColumn(
+    state: HabitState,
+    viewModel: HabitViewModel,
+    innerPadding: PaddingValues
+) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(innerPadding)
+            .padding(horizontal = 6.dp)
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(
+            items = state.habitList,
+            key = { it.habit.id }
+        ) { habitWithDays ->
+            val dismissState = rememberSwipeToDismissBoxState(
+                confirmValueChange = { value ->
+                    if (value == SwipeToDismissBoxValue.EndToStart) {
+                        viewModel.deleteHabit(habitWithDays)
+                        true
+                    } else {
+                        false
+                    }
+                },
+                positionalThreshold = { totalDistance ->
+                    totalDistance * 0.7f
+                }
+            )
+
+            SwipeToDismissBox(
+                modifier = Modifier.animateItem(),
+                state = dismissState,
+                backgroundContent = {
+                    DeleteBackground()
+                }
+            ) {
+                HabitYearItem(
+                    habitWithDays = habitWithDays,
+                    today = state.today
+                )
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -251,189 +396,13 @@ private fun DeleteBackground() {
     }
 }
 
-@Composable
-private fun HabitMonth(
-    modifier: Modifier = Modifier,
-    days: List<HabitDay>,
-    habitColor: Color
-) {
-    val today = LocalDate.now()
-    val currentMonth = YearMonth.from(today)
 
-    val firstDayOfMonth = currentMonth.atDay(1)
-
-    // Понедельник = 0, вторник = 1 ... воскресенье = 6
-    val firstDayOffset =
-        firstDayOfMonth.dayOfWeek.value - DayOfWeek.MONDAY.value
-
-    val monthDates = remember(currentMonth) {
-        buildList<LocalDate?> {
-
-            // Пустые ячейки перед первым днём месяца
-            repeat(firstDayOffset) {
-                add(null)
-            }
-
-            // Дни текущего месяца
-            for (day in 1..currentMonth.lengthOfMonth()) {
-                add(currentMonth.atDay(day))
-            }
-
-            // Заполняем последнюю неделю до 7 ячеек
-            while (size % 7 != 0) {
-                add(null)
-            }
-        }
-    }
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(7),
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        userScrollEnabled = false
-    ) {
-        items(
-            count = monthDates.size,
-            key = { index -> index }
-        ) { index ->
-
-            val date = monthDates[index]
-
-            HabitMonthDay(
-                date = date,
-                habitDay = date?.let { currentDate ->
-                    days.firstOrNull {
-                        it.date == currentDate
-                    }
-                },
-                habitColor = habitColor
-            )
-        }
-    }
-}
-@Composable
-private fun HabitMonthDay(
-    date: LocalDate?,
-    habitDay: HabitDay?,
-    habitColor: Color
-) {
-    if (date == null) {
-        Spacer(
-            modifier = Modifier.size(32.dp)
-        )
-        return
-    }
-
-    val today = LocalDate.now()
-    val colors = rememberHabitColorScheme(habitColor)
-
-    val progress = habitDay?.progress ?: 0
-
-    val backgroundColor = when {
-        progress >= 100 -> {
-            colors.completed
-        }
-
-        progress > 0 -> {
-            colors.progress.copy(
-                alpha = 0.25f + (progress / 100f) * 0.5f
-            )
-        }
-
-        else -> {
-            colors.background
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .size(32.dp)
-            .clip(
-                RoundedCornerShape(7.dp)
-            )
-            .background(backgroundColor)
-            .then(
-                if (date == today) {
-                    Modifier.border(
-                        width = 2.dp,
-                        color = colors.progress,
-                        shape = RoundedCornerShape(7.dp)
-                    )
-                } else {
-                    Modifier
-                }
-            )
-    )
-}
-@Composable
-private fun HabitMonthHeader(
-    habitWithDays: HabitWithDays,
-    month: String,
-    streak: Int,
-    colors: HabitColorScheme,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        // Иконка
-        Box(
-            modifier = Modifier
-                .size(72.dp)
-                .background(
-                    color = colors.background,
-                    shape = CircleShape
-                )
-                .border(
-                    width = 5.dp,
-                    color = colors.track,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "😍",
-                fontSize = 32.sp
-            )
-        }
-
-        Spacer(
-            modifier = Modifier.width(16.dp)
-        )
-
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = habitWithDays.habit.title,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Text(
-                text ="сент.2026",
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        StreakIcon(
-            streak = streak,
-            color = colors.background
-        )
-    }
-}
 @Composable
 private fun HabitWeekItem(
+    habitWithDays: HabitWithDays,
+    today: LocalDate
 ) {
-    val habitWithDays = HabitWithDays(
-        habit = Habit(title = "Зарядка", color = Color.Red),
-        days = habitWeekTestList()
-    )
+
     Card(
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
@@ -442,8 +411,6 @@ private fun HabitWeekItem(
         )
     ) {
         val colors = rememberHabitColorScheme(habitWithDays.habit.color)
-        val today = LocalDate.now()
-
         val todayHabitDay = habitWithDays.days
             .firstOrNull { it.date == today }
         Row(
@@ -482,38 +449,358 @@ private fun HabitWeekItem(
     }
 }
 
-
 @Composable
-private fun HabitWeek(
+private fun HabitMonthItem(
+    habitWithDays: HabitWithDays,
+    today: LocalDate,
     modifier: Modifier = Modifier,
-    days: List<HabitDay>,
-    habitColor: Color
 ) {
-    val today = LocalDate.now()
+    val habit = habitWithDays.habit
+    val colors = rememberHabitColorScheme(habit.color)
 
-    val startOfWeek = today.with(
-        TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
-    )
+    val month = YearMonth.from(today)
 
-    val weekDates = (0..6).map { offset ->
-        startOfWeek.plusDays(offset.toLong())
+    val firstDayOffset =
+        month.atDay(1).dayOfWeek.value - DayOfWeek.MONDAY.value
+
+    val daysInMonth = month.lengthOfMonth()
+
+    val calendarDays = buildList {
+        repeat(firstDayOffset) {
+            add(null)
+        }
+
+        for (day in 1..daysInMonth) {
+            add(month.atDay(day))
+        }
+
+        while (size % 7 != 0) {
+            add(null)
+        }
     }
 
-    Row(
+    Card(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
     ) {
-        weekDates.forEach { date ->
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
 
-            HabitWeekDay(
-                date = date,
-                habitDay = days.firstOrNull { it.date == date },
-                habitColor = habitColor
+
+            HabitMonthHeader(
+                modifier = modifier,
+                habitWithDays = habitWithDays,
+                today = today,
+                colors = colors
+            )
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            // Календарь 7 x 5
+            calendarDays
+                .chunked(7)
+                .forEach { week ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        week.forEach { date ->
+
+                            if (date == null) {
+
+                                Spacer(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .aspectRatio(1.15f)
+                                )
+
+                            } else {
+
+                                val habitDay =
+                                    habitWithDays.days.firstOrNull {
+                                        it.date == date
+                                    }
+
+                                HabitMonthDay(
+                                    modifier = Modifier.weight(1f),
+                                    date = date,
+                                    habitDay = habitDay,
+                                    today = today,
+                                    habitColor = habit.color,
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(
+                        modifier = Modifier.height(8.dp)
+                    )
+                }
+        }
+    }
+}
+@Composable
+private fun HabitYearItem(
+    habitWithDays: HabitWithDays,
+    today: LocalDate,
+    modifier: Modifier = Modifier,
+) {
+    val habit = habitWithDays.habit
+    val colors = rememberHabitColorScheme(habit.color)
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            HabitYearHeader(
+                habitWithDays = habitWithDays,
+                today = today,
+                colors = colors
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            HabitYearGrid(
+                habitWithDays = habitWithDays,
+                today = today
             )
         }
     }
 }
+@Composable
+private fun HabitYearHeader(
+    habitWithDays: HabitWithDays,
+    today: LocalDate,
+    colors: HabitColorScheme
+) {
+    val todayHabitDay = habitWithDays.days
+        .firstOrNull { it.date == today }
 
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        HabitCircleProgress(
+            progressPercent = todayHabitDay?.progress ?: 0,
+            color = colors.background,
+            trackColor = colors.background,
+            modifier = Modifier.size(44.dp)
+        )
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 4.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = habitWithDays.habit.title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 14.sp
+            )
+
+            Text(
+                text = today.parseToString(),
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        StreakIcon(
+            streak = 3,
+            color = colors.background
+        )
+    }
+}
+@Composable
+private fun HabitYearGrid(
+    habitWithDays: HabitWithDays,
+    today: LocalDate,
+) {
+    val year = today.year
+    val firstDay = LocalDate.of(year, 1, 1)
+    val firstDayOffset = firstDay.dayOfWeek.value - 1
+    val daysInYear = if (Year.isLeap(year.toLong())) 366 else 365
+
+    val totalCells = firstDayOffset + daysInYear
+    val totalWeeks = (totalCells + 6) / 7
+
+    val dates = remember(year) {
+        List(totalWeeks * 7) { index ->
+            firstDay
+                .plusDays((index - firstDayOffset).toLong())
+                .takeIf { it.year == year }
+        }
+    }
+
+    val daysByDate = remember(habitWithDays.days) {
+        habitWithDays.days.associateBy { it.date }
+    }
+
+    LazyHorizontalGrid(
+        rows = GridCells.Fixed(7),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(7 * 8.dp + 6 * 3.dp),
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp),
+        userScrollEnabled = false
+    ) {
+        items(
+            count = dates.size,
+            key = { it }
+        ) { index ->
+            val date = dates[index]
+
+            if (date == null) {
+                Spacer(Modifier.size(8.dp))
+            } else {
+                HabitYearDay(
+                    modifier = Modifier.size(8.dp),
+                    date = date,
+                    habitDay = daysByDate[date],
+                    today = today,
+                    habitColor = habitWithDays.habit.color
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HabitYearDay(
+    date: LocalDate,
+    habitDay: HabitDay?,
+    today: LocalDate,
+    habitColor: Color,
+    modifier: Modifier = Modifier
+) {
+    val colors = rememberHabitColorScheme(habitColor)
+
+    val isToday = date == today
+    val isFuture = date.isAfter(today)
+    val progress = habitDay?.progress ?: 0
+
+    val backgroundColor = when {
+        isFuture ->
+            MaterialTheme.colorScheme.surfaceVariant
+
+        habitDay?.isCompleted == true ->
+            colors.completed
+
+        progress > 0 ->
+            colors.progress.copy(
+                alpha = 0.25f + progress / 100f * 0.45f
+            )
+
+        else ->
+            colors.background
+    }
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(3.dp))
+            .background(backgroundColor)
+            .then(
+                if (isToday) {
+                    Modifier.border(
+                        width = 1.dp,
+                        color = colors.progress.copy(alpha = 0.7f),
+                        shape = RoundedCornerShape(3.dp)
+                    )
+                } else {
+                    Modifier
+                }
+            )
+    )
+}
+
+@Composable
+private fun HabitMonthDay(
+    date: LocalDate,
+    habitDay: HabitDay?,
+    today: LocalDate,
+    habitColor: Color,
+    modifier: Modifier = Modifier
+) {
+    val colors = rememberHabitColorScheme(habitColor)
+
+    val isToday = date == today
+    val isFuture = date.isAfter(today)
+
+    val progress = habitDay?.progress ?: 0
+
+    val backgroundColor = when {
+        isFuture ->
+            MaterialTheme.colorScheme.surfaceVariant
+
+        habitDay?.isCompleted == true ->
+            colors.completed
+
+        progress > 0 ->
+            colors.progress.copy(
+                alpha = 0.25f + progress / 100f * 0.45f
+            )
+
+        else ->
+            colors.background
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(1.15f)
+            .clip(RoundedCornerShape(6.dp))
+            .background(backgroundColor)
+            .then(
+                if (isToday) {
+                    Modifier.border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                } else {
+                    Modifier
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        // Число дня
+        Text(
+            text = date.dayOfMonth.toString(),
+            style = MaterialTheme.typography.labelSmall,
+            color = if (isFuture) {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else {
+                MaterialTheme.colorScheme.onBackground
+            }
+        )
+    }
+}
 
 @Composable
 private fun HabitWeekDay(
@@ -581,6 +868,114 @@ private fun HabitWeekDay(
                     height = 4.dp
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun HabitMonthHeader(
+    modifier: Modifier = Modifier,
+    habitWithDays: HabitWithDays,
+    today: LocalDate,
+    colors: HabitColorScheme
+) {
+    val todayHabitDay = habitWithDays.days
+        .firstOrNull { it.date == today }
+
+
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            HabitCircleProgress(
+                progressPercent = todayHabitDay?.progress ?: 0,
+                color = colors.background,
+                trackColor = colors.background,
+                modifier = Modifier
+                    .size(44.dp)
+
+            )
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp),
+                    text = habitWithDays.habit.title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp),
+                        text = today.parseToString(),
+                        fontSize = 12.sp
+                    )
+                    StreakIcon(
+                        streak = 3,
+                        color = colors.background
+                    )
+                }
+            }
+
+        }
+        Spacer(
+            modifier = Modifier.height(4.dp)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            DayOfWeek.entries.forEach { dayOfWeek ->
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = dayOfWeek.localeAndMapToString("ru"),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                    lineHeight = 14.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HabitWeek(
+    modifier: Modifier = Modifier,
+    days: List<HabitDay>,
+    habitColor: Color
+) {
+    val today = LocalDate.now()
+
+    val startOfWeek = today.with(
+        TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
+    )
+
+    val weekDates = (0..6).map { offset ->
+        startOfWeek.plusDays(offset.toLong())
+    }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        weekDates.forEach { date ->
+
+            HabitWeekDay(
+                date = date,
+                habitDay = days.firstOrNull { it.date == date },
+                habitColor = habitColor
+            )
         }
     }
 }
@@ -827,14 +1222,113 @@ private fun habitWeekTestList(): List<HabitDay> {
     )
 }
 
+//@ThemePreviews
+//@Composable
+//private fun HabitPreview() {
+//    HelperJCTheme() {
+//        HabitScreen()
+//    }
+//}
 @ThemePreviews
 @Composable
-private fun HabitPreview() {
-    HelperJCTheme() {
-        HabitScreen()
+private fun HabitPeriodsPreview() {
+    HelperJCTheme {
+        val today = LocalDate.of(2026, 10, 6)
 
+        val habits = listOf(
+            HabitWithDays(
+                habit = Habit(
+                    id = 1,
+                    title = "Привет Привет...",
+                    color = Color(0xFF00BFA5)
+                ),
+                days = previewHabitDays(1)
+            ),
+            HabitWithDays(
+                habit = Habit(
+                    id = 2,
+                    title = "Зарядка",
+                    color = Color.Red
+                ),
+                days = previewHabitDays(2)
+            )
+        )
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(6.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Месяц
+            item {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(380.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    userScrollEnabled = false
+                ) {
+                    items(
+                        items = habits,
+                        key = { "month-${it.habit.id}" }
+                    ) { habit ->
+                        HabitMonthItem(
+                            habitWithDays = habit,
+                            today = today
+                        )
+                    }
+                }
+            }
+
+            // Неделя
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    habits.forEach { habit ->
+                        HabitWeekItem(
+                            habitWithDays = habit,
+                            today = today
+                        )
+                    }
+                }
+            }
+
+            // Год
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    habits.forEach { habit ->
+                        HabitYearItem(
+                            habitWithDays = habit,
+                            today = today
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
+private fun previewHabitDays(habitId: Int): List<HabitDay> {
+    val start = LocalDate.of(2026, 1, 1)
 
-
+    return (0 until 280)
+        .map { start.plusDays(it.toLong()) }
+        .filter { it.dayOfWeek.value % 2 == 0 }
+        .mapIndexed { index, date ->
+            HabitDay(
+                id = habitId * 1000 + index,
+                habitId = habitId,
+                date = date,
+                isCompleted = index % 3 != 0,
+                countOfRepetitions = 1,
+                countOfCompletedRepetitions = if (index % 3 != 0) 1 else 0,
+                progress = if (index % 3 != 0) 100 else 40
+            )
+        }
+}

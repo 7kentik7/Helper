@@ -11,6 +11,10 @@ fun LocalDateTime.parseToString(): String {
     val formatter = DateTimeFormatter.ofPattern("d MMM yyyy")
     return this.format(formatter)
 }
+fun LocalDate.parseToString(): String {
+    val formatter = DateTimeFormatter.ofPattern("MMM yyyy")
+    return this.format(formatter)
+}
 
 fun String.parseToLocalDateTime(): LocalDateTime {
     val formatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale("ru"))
