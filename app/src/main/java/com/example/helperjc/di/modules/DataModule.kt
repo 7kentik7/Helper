@@ -3,6 +3,8 @@ package com.example.helperjc.di.modules
 import android.app.Application
 import android.content.Context
 import com.example.helperjc.data.local.database.AppDatabase
+import com.example.helperjc.data.local.database.dao.HabitDao
+import com.example.helperjc.data.local.database.dao.HabitDayDao
 
 import com.example.helperjc.data.local.database.dao.PlanDao
 import com.example.helperjc.data.local.database.dao.TaskDao
@@ -30,6 +32,16 @@ object DataModule {
     @Provides
     fun providePlanDao(application: Application): PlanDao =
         AppDatabase.getInstance(application).planDao()
+
+    @Singleton
+    @Provides
+    fun provideHabitDao(application: Application): HabitDao =
+        AppDatabase.getInstance(application).habitDao()
+
+    @Singleton
+    @Provides
+    fun provideHabitDayDao(application: Application): HabitDayDao =
+        AppDatabase.getInstance(application).habitDayDao()
 
     @Singleton
     @Provides

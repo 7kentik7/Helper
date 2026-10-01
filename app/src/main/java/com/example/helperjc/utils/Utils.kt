@@ -1,6 +1,9 @@
 package com.example.helperjc.utils
 
+
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
 import com.example.helperjc.domain.plans.Plan
 import com.example.helperjc.domain.tasks.Task
@@ -45,6 +48,21 @@ fun Color.toHex(): String {
     val b = (blue * 255).toInt()
     val a = (alpha * 255).toInt()
     return String.format("#%02X%02X%02X%02X", a, r, g, b)
+}
+
+ fun Color.toVisibleProgressColor(): Color {
+    val hsl = FloatArray(3)
+
+    ColorUtils.colorToHSL(
+        toArgb(),
+        hsl
+    )
+
+    hsl[2] = hsl[2].coerceIn(0.45f, 0.65f)
+
+    return Color(
+        ColorUtils.HSLToColor(hsl)
+    )
 }
 
 fun String.toColor(): Color {

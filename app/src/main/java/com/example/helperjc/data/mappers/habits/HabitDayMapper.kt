@@ -2,25 +2,24 @@ package com.example.helperjc.data.mappers.habits
 
 import com.example.helperjc.data.local.database.models.HabitDayDbModel
 import com.example.helperjc.domain.habbits.HabitDay
-import com.example.helperjc.utils.toEpochMonth
-import com.example.helperjc.utils.toYearMonth
+import com.example.helperjc.utils.toEpochDayLong
+import com.example.helperjc.utils.toLocalDate
 import javax.inject.Inject
 
 class HabitDayMapper @Inject constructor() {
     fun mapEntityToModel(entity: HabitDay): HabitDayDbModel = HabitDayDbModel(
         id = entity.id,
-        day = entity.day,
-        period = entity.period.toEpochMonth(),
+        habitId = entity.habitId,
+        date = entity.date.toEpochDayLong(),
         isCompleted = entity.isCompleted,
         countOfRepetitions = entity.countOfRepetitions,
         countOfCompletedRepetitions = entity.countOfCompletedRepetitions,
-
     )
 
     fun mapModelToEntity(model: HabitDayDbModel): HabitDay = HabitDay(
         id = model.id,
-        day = model.day,
-        period = model.period.toYearMonth(),
+        habitId = model.habitId,
+        date = model.date.toLocalDate(),
         isCompleted = model.isCompleted,
         countOfRepetitions = model.countOfRepetitions,
         countOfCompletedRepetitions = model.countOfCompletedRepetitions,

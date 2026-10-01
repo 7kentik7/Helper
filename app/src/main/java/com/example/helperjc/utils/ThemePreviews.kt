@@ -8,7 +8,7 @@ import android.content.res.Configuration
 @Preview(
     name = "Light",
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    uiMode = Configuration.UI_MODE_NIGHT_NO, showSystemUi = false
 )
 @Preview(
     name = "Dark",
